@@ -2,12 +2,9 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import {ApiResponse} from '../utils/ApiResponse.js';
 import {asyncHandler} from '../utils/asyncHandler.js';
-// import bcrypt from 'bcrypt'
 
 const registerUser = asyncHandler(async (req,res) => {
-    // console.log(req.body);
     const {username, email,password} = req.body
-    // console.log(req.body.username);
 
     //check any element come empty from user
     if([username, email, password].some((field) => field?.trim() === "")){
@@ -22,14 +19,6 @@ const registerUser = asyncHandler(async (req,res) => {
     if(existUser){
         throw new ApiError(400, 'user with same username or email already existed')
     }
-
-    // const hashPassword = await bcrypt.hash(password, 2, function(err, hash) {
-    //     if(err){
-    //         throw new ApiError(400,"error from bcrypt: ")
-    //     }else{
-    //         return hash
-    //     }
-    // });
 
     const user = await User.create({
         username,

@@ -16,12 +16,7 @@ app.use(cookieParser())
 //import routes here
 import registerUserRoute from "./routes/user.route.js";
 
-
+//call api here
 app.use('/user',registerUserRoute)
-
-// app.post('/user', (req,res) => {
-//     // res.send(req.body)
-//     console.log(req.body);
-// })
 
 export {app}
