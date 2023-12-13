@@ -1,8 +1,10 @@
+// import app from './../app.js'
+
 class ApiError extends Error{
     constructor(
         statusCode,
         message = "something went wrong",
-        errors = [],
+        errors = []
     ){
         super(message)
         this.statusCode = statusCode
@@ -10,11 +12,23 @@ class ApiError extends Error{
         this.success = false
         this.errors = errors
         this.data = null
-
     }
 }
 
-export {ApiError}
+const handleError = (err, res) => {
+    const { statusCode, message, errors } = err;
+    res.status(statusCode || 500).json({
+      success: false,
+      error: {
+        statusCode,
+        message,
+        errors,
+      },
+      data: null,
+    });
+};
+
+export {ApiError, handleError}
 
 /**
  * this ApiError function call when any error accour while running a controller file

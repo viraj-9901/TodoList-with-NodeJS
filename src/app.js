@@ -20,5 +20,9 @@ import registerUserRoute from "./routes/user.route.js";
 
 //call api here
 app.use('/user',registerUserRoute)
+app.get('/profile',passport.authenticate('jwt', { session: false }),(req, res) => {
+    res.send('You have accessed a protected route!');
+})
+    
 
 export {app}
