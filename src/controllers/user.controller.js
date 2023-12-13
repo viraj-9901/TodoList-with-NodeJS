@@ -11,7 +11,7 @@ const registerUser = asyncHandler(async (req,res) => {
         throw new ApiError(400,"all field required!")
     }
 
-    //check for if user already exist or not
+    //check: if user already exist or not
     const existUser = await User.findOne({
         $or: [{email},{username}]
     })
@@ -20,6 +20,7 @@ const registerUser = asyncHandler(async (req,res) => {
         throw new ApiError(400, 'user with same username or email already existed')
     }
 
+    //create new user in database
     const user = await User.create({
         username,
         email,
@@ -32,9 +33,13 @@ const registerUser = asyncHandler(async (req,res) => {
 
     if(!createdUser) throw new ApiError(500,'something went wrong while registoring user')
 
-    return res.status(200).json(
-        new ApiResponse(201,'user registration completed successfully',createdUser)
+    //generate jwt token for user
+    const token = await user.getAccessToken()
+
+    return res.status(200).send(
+        new ApiResponse(201,'user registration completed successfully',token,createdUser)
     )
+
 })
 
 export {registerUser}

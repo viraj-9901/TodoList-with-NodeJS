@@ -1,6 +1,7 @@
 import express from "express";
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import passport from "passport";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(cors({
 app.use(express.urlencoded({extended: true, limit:'16kb'}))
 app.use(express.json())
 app.use(cookieParser())
+app.use(passport.initialize())
 
 
 //import routes here

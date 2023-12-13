@@ -1,6 +1,7 @@
 import mongoose,{ Schema } from "mongoose";
 import bcrypt from 'bcrypt';
 import Jwt from "jsonwebtoken";
+// import { app } from "../app";
 
 const userSchema = new Schema({
     username:{
@@ -23,6 +24,7 @@ const userSchema = new Schema({
     }
 }, { timestamps: true }) 
 
+//hash password before user create in database
 userSchema.pre('save', async function(next){
     try {
         if(this.password && this.isModified('password')){
@@ -34,17 +36,19 @@ userSchema.pre('save', async function(next){
     }
  })
 
-userSchema.methods.isPasswordCorrect = async function(password){
+//compare user password with stored hashPassword in database while login 
+userSchema.methods.isPasswordCorrect = async function (password){
     return await bcrypt.compare(password,this.password)
 } 
 
+//generate jwt token 
 userSchema.methods.getAccessToken = function(){
     return Jwt.sign(
         {
             _id: this._id,
             username: this.username,
             email: this.email,
-            password: this.password
+            // password: this.password
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
@@ -53,6 +57,5 @@ userSchema.methods.getAccessToken = function(){
     )
 }
 
-
-
 export const User = mongoose.model('User',userSchema)
+
