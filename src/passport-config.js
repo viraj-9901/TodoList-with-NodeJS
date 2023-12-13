@@ -2,8 +2,6 @@
 import {Strategy, ExtractJwt} from 'passport-jwt';
 import { User } from './models/user.model.js';
 import passport from 'passport';
-import { config } from 'dotenv';
-
 
 const opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

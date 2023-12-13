@@ -2,6 +2,7 @@ import express from "express";
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import passport from "passport";
+import {  } from './passport-config.js'
 
 const app = express();
 
