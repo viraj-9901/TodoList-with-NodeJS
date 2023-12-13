@@ -25,7 +25,7 @@ const loginUser = asyncHandler( async (req,res) => {
 
         //check: password is correct or not
         const isPasswordMatch = await user.isPasswordCorrect(password);
-        console.log(isPasswordMatch);
+        // console.log(isPasswordMatch);
         if (!isPasswordMatch) {
             throw new ApiError(401,'username or password invalid!')  
         } 
