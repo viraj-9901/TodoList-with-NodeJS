@@ -16,3 +16,4 @@ router.route('/profile',passport.authenticate('jwt', { session: false }))
         );
 
 export default router
+
