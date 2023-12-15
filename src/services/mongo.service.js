@@ -1,10 +1,19 @@
 import { Task } from "../models/task.model.js";
 import { ApiError, handleError } from "../utils/ApiError.js";
 
-//function: get all task of user
-const getAllTasks = async (username) => {
+//function: get task of user
+const getTasks = async (username,key,value) => {
     try {
-        return await Task.find({"owner": username})
+        let filter = {}
+        filter[key] = value
+
+        if(Object.keys(filter).length == 0){
+            return await Task.find({"owner": username})
+        } else {
+            return await Task.find({
+                $and: [{"owner": username}, filter]
+            })
+        }
     } catch (error) {
         handleError(error,res)
     }
@@ -16,28 +25,6 @@ const getOneTask = async (username,taskId) => {
         return await Task.findOne({
             $and: [{"owner": username}, {"_id": taskId}]
         }) 
-    } catch (error) {
-        handleError(error,res)
-    }
-}
-
-//function: get task by priority
-const getTaskByPriority = async (username,priority) => {
-    try {
-       return await Task.find({
-            $and: [{"owner": username}, {"priority": priority}]
-        })
-    } catch (error) {
-        handleError(error,res)
-    }
-}
-
-//function: get task by status
-const getTaskBystatus = async (username,status) => {
-    try {
-        return await Task.find({
-            $and: [{"owner": username}, {"status": status}]
-        })
     } catch (error) {
         handleError(error,res)
     }
@@ -72,13 +59,40 @@ const deleteTask = async (username,taskId) => {
     }
 }
 
+//function: update task
+const updateTask = async (username,taskId,info) => {
+    try {
+
+        const previousData = await Task.findOne({
+            $and: [{"owner": username}, {"_id": taskId}]
+        })
+        
+        return await Task.updateOne(
+            {
+                $and: [{"owner": username}, {"_id": taskId}]
+            },
+            {
+                $set : {
+                    title: info.title || previousData.title,
+                    description: info.description || previousData.description,
+                    due_date: info.due_date || previousData.due_date,
+                    priority: info.priority || previousData.priority,
+                    status: info.status || previousData.status
+                }
+            }            
+        )
+    } catch (error) {
+        handleError(error,res)
+        
+    }
+}
+
 const mongoService = {
-    getAllTasks,
+    getTasks,
     getOneTask,
-    getTaskByPriority,
-    getTaskBystatus,
     createTask,
-    deleteTask
+    deleteTask,
+    updateTask
 }
 
 export default mongoService

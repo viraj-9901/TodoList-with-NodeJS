@@ -7,11 +7,14 @@ import moment from 'moment';
 
 moment().format();
 
-//get all tasks of user
-const getAllTasks = asyncHandler(async (req,res) => {
+//get tasks of user
+const getTasks = asyncHandler(async (req,res) => {
     const {username} = req.params
+    const key = req.query.filter;
+    const value = req.query.value;
+
     try {
-        const data = await mongoService.getAllTasks(username);
+        const data = await mongoService.getTasks(username,key,value);
         return res.status(200).send(
             new ApiResponse(200,data)
         )
@@ -36,37 +39,6 @@ const getOneTask = asyncHandler( async (req,res) => {
     }
 })
 
-//get task(s) by priority
-const getTaskByPriority = asyncHandler(async (req,res) => {
-    const {username} = req.params;
-    const {priority} = req.query;
-
-    try {
-        const data = await mongoService.getTaskByPriority(username,priority);
-
-        return res.status(200).send(
-            new ApiResponse(200,data)
-        )
-    } catch (error) {
-        handleError(error,res)
-    }
-})
-
-//get task(s) by status
-const getTaskBystatus = asyncHandler( async (req,res) => {
-    const {username} = req.params;
-    const {status} = req.query;
-
-    try {
-        const data = await mongoService.getTaskBystatus(username,status)
-
-        return res.status(200).send(
-            new ApiResponse(200,data)
-        )
-    } catch (error) {
-        handleError(error,res)
-    }
-})
 
 //add task to particular user
 const createTask = asyncHandler( async(req,res) => {
@@ -107,6 +79,7 @@ const createTask = asyncHandler( async(req,res) => {
 
 })
 
+//delete task
 const deleteTask = asyncHandler(async (req,res) => {
     const username = req.params.username
     const taskId = req.params.taskId
@@ -122,13 +95,30 @@ const deleteTask = asyncHandler(async (req,res) => {
     }
 })
 
+//update task
+const updateTask = asyncHandler(async (req,res) => {
+    const username = req.params.username
+    const taskId = req.params.taskId
+    const info = req.body
+    try {
+        const data = await mongoService.updateTask(username,taskId,info)
+        
+        return res.status(200).send(
+            new ApiResponse(200,data)
+        )
+
+    } catch (error) {
+        handleError(error,res)
+    }
+})
+
+
 const taskController = {
-    getAllTasks,
+    getTasks,
     getOneTask,
-    getTaskByPriority,
-    getTaskBystatus,
     createTask,
-    deleteTask
+    deleteTask,
+    updateTask
 }
 
 export default taskController

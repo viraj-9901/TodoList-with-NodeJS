@@ -15,19 +15,11 @@ router.route('/login').post(loginUser);
 
 //route: get all tasks of user
 router.route('/:username',passport.authenticate('jwt', { session: false }))
-      .get(taskController.getAllTasks);
+      .get(taskController.getTasks);
 
 //route: get perticular task of user
 router.route('/:username/:taskId',passport.authenticate('jwt', { session: false }))
       .get(taskController.getOneTask);
-
-//route: get all priority task of user
-router.route('/:username/?priority=${value}',passport.authenticate('jwt', { session: false }))
-      .get(taskController.getTaskByPriority)
-
-//route: get task by status
-router.route('/:username/?status=${value}',passport.authenticate('jwt', { session: false }))
-      .get(taskController.getTaskBystatus)
 
 //route: (post) add task 
 router.route('/:username',passport.authenticate('jwt', { session: false }))
@@ -36,6 +28,10 @@ router.route('/:username',passport.authenticate('jwt', { session: false }))
 //route: delete task from user
 router.route('/:username/:taskId',passport.authenticate('jwt', { session: false }))
       .delete(taskController.deleteTask);
+
+//route: update particular task
+router.route('/:username/:taskId',passport.authenticate('jwt', { session: false }))
+      .put(taskController.updateTask);
 
 export default router
 
