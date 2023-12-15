@@ -1,5 +1,7 @@
 class ApiResponse{
     constructor(statusCode,message= "success",token,data){
+        if(token == "") this.token = token
+        
         this.statusCode = statusCode
         this.token = token
         this.data = data

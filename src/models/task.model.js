@@ -16,11 +16,16 @@ const taskSchema = new Schema({
         required: true
     },
     priority:{
-        type: Boolean,
+        type: String,
         required: true
     },
     status:{
-        type: Boolean
+        type: String,
+        default: null
+    },
+    owner:{
+        type: String,
+        required: true
     }
 },{ timestamps: true })
 

@@ -9,7 +9,7 @@ const registerUser = asyncHandler(async (req,res) => {
         const {username, email,password} = req.body
 
         //check any element come empty from user
-        if([username, email, password].some((field) => field?.trim() === "")){
+        if([username, email, password].some((field) => field?.trim() === "" || field === undefined)){
             throw new ApiError(400,"all field required!")
         }
 

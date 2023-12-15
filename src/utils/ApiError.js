@@ -1,5 +1,3 @@
-// import app from './../app.js'
-
 class ApiError extends Error{
     constructor(
         statusCode,
@@ -15,9 +13,11 @@ class ApiError extends Error{
     }
 }
 
-const handleError = (err, res) => {
+const handleError = (err) => {
+  try {
     const { statusCode, message, errors } = err;
-    res.status(statusCode || 500).json({
+    return {
+      statusCode:statusCode,
       success: false,
       error: {
         statusCode,
@@ -25,7 +25,23 @@ const handleError = (err, res) => {
         errors,
       },
       data: null,
-    });
+    }
+  } 
+  catch (error) {
+    console.log(error);
+    const { statusCode, message, errors } = error;
+
+    return {
+      statusCode:statusCode,
+      success: false,
+      error: {
+        statusCode,
+        message,
+        errors,
+      },
+      data: null,
+    }
+  }
 };
 
 export {ApiError, handleError}
