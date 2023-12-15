@@ -2,17 +2,20 @@ import { Task } from "../models/task.model.js";
 import { ApiError, handleError } from "../utils/ApiError.js";
 
 //function: get task of user
-const getTasks = async (username,key,value) => {
+const getTasks = async (username,key,value,sortOrder = 1) => {
     try {
         let filter = {}
         filter[key] = value
+
+        let sort = {}
+        sort[key] = value
 
         if(Object.keys(filter).length == 0){
             return await Task.find({"owner": username})
         } else {
             return await Task.find({
                 $and: [{"owner": username}, filter]
-            })
+            }).sort({dueDate: sortOrder})
         }
     } catch (error) {
         handleError(error,res)

@@ -11,11 +11,21 @@ moment().format();
 //get tasks of user
 const getTasks = asyncHandler(async (req,res) => {
     const {username} = req.params
+
     const key = req.query.filter;
-    const value = req.query.value;
+    let value = req.query.value;
+    if(value == ""){
+        key === 'priority'? value = 'normal' : value = 'hold'    
+    }
+
+    const sort = req.query.sort;
+    let sortOrder = req.query.value;
+    if(sortOrder == "" || sortOrder == "asc"){
+        sortOrder = 1
+    } else { sortOrder = -1}
 
     try {
-        const data = await mongoService.getTasks(username,key,value);
+        const data = await mongoService.getTasks(username,key,value,sortOrder);
         return res.status(200).send(
             new ApiResponse(200,data)
         )
