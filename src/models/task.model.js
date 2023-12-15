@@ -11,17 +11,18 @@ const taskSchema = new Schema({
         type:String,
         required: true
     },
-    due_date:{
+    dueDate:{
         type: Date,
         required: true
     },
     priority:{
         type: String,
-        required: true
+        required: true,
+        enum: ['important','normal']
     },
     status:{
         type: String,
-        default: null
+        enum: ['pending','hold','completed']
     },
     owner:{
         type: String,

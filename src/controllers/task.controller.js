@@ -2,6 +2,7 @@ import { ApiError, handleError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"; 
 import mongoService from '../services/mongo.service.js';
+
 import moment from 'moment';
 
 
@@ -43,27 +44,14 @@ const getOneTask = asyncHandler( async (req,res) => {
 //add task to particular user
 const createTask = asyncHandler( async(req,res) => {
     
-    const {title, description, due_date, status, priority} = req.body;
+    const {title, description, dueDate, status, priority} = req.body;
     const owner = req.params.username   
-    let regex =/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
-    
-    let currentDate = Date.now()
-
-    if(!String(due_date).match(regex)) throw new ApiError(400,"date formate invalid")
-    const dueDateObj = moment(due_date, 'YYYY-MM-DD').toDate();
-
-    if(dueDateObj < currentDate) throw new ApiError(400,'Current date is greater than due_date' )
-
-    if([title, description, dueDateObj, priority, status, owner].some((field) => field === "" || field === undefined)){
-        throw new ApiError(400,"all field required!")
-    }
-
 
     try {
         const data = await mongoService.createTask(
             title, 
             description, 
-            dueDateObj, 
+            dueDate, 
             priority,  
             status,
             owner

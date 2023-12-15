@@ -31,12 +31,12 @@ const getOneTask = async (username,taskId) => {
 }
 
 //function: create task for user
-const createTask = async (title, description, dueDateObj, priority, status, owner) => {
+const createTask = async (title, description, dueDate, priority, status, owner) => {
     try {
         const task = await Task.create({
             title, 
             description, 
-            due_date: dueDateObj, 
+            dueDate, 
             priority,  
             status,
             owner
@@ -75,7 +75,7 @@ const updateTask = async (username,taskId,info) => {
                 $set : {
                     title: info.title || previousData.title,
                     description: info.description || previousData.description,
-                    due_date: info.due_date || previousData.due_date,
+                    dueDate: info.dueDate || previousData.duDate,
                     priority: info.priority || previousData.priority,
                     status: info.status || previousData.status
                 }
