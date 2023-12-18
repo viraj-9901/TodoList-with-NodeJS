@@ -34,14 +34,42 @@ const validator = {
             let regex =/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
             
             let currentDate = Date.now()
+            const {username, email, password, role} = req.body
 
+            //check any element come empty from user
+            if([username, email, password].some((field) => field?.trim() === "" || field === undefined)){
+                throw new ApiError(400,"all field required!")
+            }
             if(!String(dueDate).match(regex)) throw new ApiError(400,"date formate invalid")
             dueDate = moment(dueDate, 'YYYY-MM-DD').toDate();
 
             if(dueDate < currentDate) throw new ApiError(400,'Current date is greater than due_date' )
         }
 
+    },
+
+    register: async (req,res,next) => {
+        const {username, email, password, role} = req.body
+
+        //check any element come empty from user
+        if([username, email, password].some((field) => field?.trim() === "" || field === undefined)){
+            throw new ApiError(400,"all field required!")
+        }
+
+        next()
+    },
+
+    login: async (req,res,next) => {
+        const {username, password} = req.body
+
+        //check any element come empty from user
+        if([username, password].some((field) => field?.trim() === "" || field === undefined)){
+            throw new ApiError(400,"username and password required!",['Error details'])
+        }
+
+        next()
     }
+     
 
 }
 

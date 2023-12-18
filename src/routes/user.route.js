@@ -8,10 +8,12 @@ import { validator } from "../middlewares/validator.middleware.js";
 const router = Router()
 
 //route: register user 
-router.route('/register').post(registerUser);
+router.route('/register')
+      .post(registerUser);
 
 //route: login user 
-router.route('/login',validator.token).post(loginUser);
+router.route('/login',[validator.token, validator.login])
+      .post(loginUser);
 
 //route: get tasks of user
 router.route('/:username',validator.token)
@@ -32,6 +34,9 @@ router.route('/:username/:taskId',validator.token)
 //route: update particular task
 router.route('/:username/:taskId',[validator.token, validator.task])
       .put(taskController.updateTask);
+
+//route: Admin 
+//router.route('/admin/:username',validator.token).get(taskController.getAllData)
 
 export default router
 

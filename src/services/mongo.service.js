@@ -1,20 +1,25 @@
 import { Task } from "../models/task.model.js";
+import { User } from "../models/user.model.js";
 import { ApiError, handleError } from "../utils/ApiError.js";
 
 //function: get task of user
-const getTasks = async (username,key,value,sortOrder = 1) => {
+const getTasks = async (username,filter,value,sortOrder = 1) => {
     try {
-        let filter = {}
-        filter[key] = value
+        let filterOption = {}
+        filterOption[filter] = value
 
-        let sort = {}
-        sort[key] = value
+        let data = await User.findOne({username})
+        // console.log(data);
 
+        if(data.role == 'admin'){ 
+            return await User.find()
+            // return await Task.find()
+        }
         if(Object.keys(filter).length == 0){
             return await Task.find({"owner": username})
         } else {
             return await Task.find({
-                $and: [{"owner": username}, filter]
+                $and: [{"owner": username}, filterOption]
             }).sort({dueDate: sortOrder})
         }
     } catch (error) {
@@ -95,7 +100,7 @@ const mongoService = {
     getOneTask,
     createTask,
     deleteTask,
-    updateTask
+    updateTask,
 }
 
 export default mongoService

@@ -6,12 +6,12 @@ import {asyncHandler} from '../utils/asyncHandler.js';
 const registerUser = asyncHandler(async (req,res) => {
 
     try {
-        const {username, email,password} = req.body
+        const {username, email, password, role} = req.body
 
-        //check any element come empty from user
-        if([username, email, password].some((field) => field?.trim() === "" || field === undefined)){
-            throw new ApiError(400,"all field required!")
-        }
+        // //check any element come empty from user
+        // if([username, email, password].some((field) => field?.trim() === "" || field === undefined)){
+        //     throw new ApiError(400,"all field required!")
+        // }
 
         //check: if user already exist or not
         const existUser = await User.findOne({
@@ -26,7 +26,8 @@ const registerUser = asyncHandler(async (req,res) => {
         const user = await User.create({
             username,
             email,
-            password
+            password,
+            role
         })
 
         const createdUser = await User.findOne(user._id).select(

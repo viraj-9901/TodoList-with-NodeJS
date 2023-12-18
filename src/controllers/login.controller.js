@@ -7,16 +7,16 @@ const loginUser = asyncHandler( async (req,res) => {
 
     try {
         
-        const {username, password} = req.body;
+        const {username, password, role} = req.body;
 
         // console.log(req.body);
 
         //check: empty and undefined username and password 
-        if([username, password].some((field) => field?.trim() === "" || field === undefined)){
-            throw new ApiError(400,"username and password required!",['Error details']);
-        }
+        // if([username, password].some((field) => field?.trim() === "" || field === undefined)){
+        //     throw new ApiError(400,"username and password required!",['Error details']);
+        // }
   
-        //check: user with username available in database or not
+        //checreqk: user with username available in database or not
         const user = await User.findOne({ username })
 
         if (user == null) {
@@ -28,10 +28,20 @@ const loginUser = asyncHandler( async (req,res) => {
         // console.log(isPasswordMatch);
         if (!isPasswordMatch) {
             throw new ApiError(401,'username or password invalid!')  
-        } 
+        }
         
         //generate jwt token for user
         const token = await user.getAccessToken()
+        
+        //check for admin
+        // if(user.role == "admin") {
+        //     return res.status(200)
+        //     .send({
+        //         // new ApiResponse(201,'Login Successfully as Admin',token,user),
+        //         redirect: "/user/admin"
+        // })
+            
+        // }
 
         return res.status(200).send(
             new ApiResponse(201,'Login Successfully',token,user)

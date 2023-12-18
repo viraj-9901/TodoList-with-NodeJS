@@ -12,20 +12,36 @@ moment().format();
 const getTasks = asyncHandler(async (req,res) => {
     const {username} = req.params
 
-    const key = req.query.filter;
+    const filter = req.query.filter;
+    console.log('filter: ',filter);
     let value = req.query.value;
+    console.log('value: ',value);
+    if(filter == ""){
+        filter = 'priority'
+        value = "normal"   
+    }
+
     if(value == ""){
-        key === 'priority'? value = 'normal' : value = 'hold'    
+        filter == "priority"? value = 'normal' : value = 'pending'
     }
 
     const sort = req.query.sort;
-    let sortOrder = req.query.value;
+    console.log('sort: ',sort);
+    let sortOrder = req.query.order;
+    console.log('sortOrder: ',sortOrder);
     if(sortOrder == "" || sortOrder == "asc"){
         sortOrder = 1
     } else { sortOrder = -1}
 
+    // const user = req.query.user;
+    // console.log('user: ',user);
+    // let type = req.query.type;
+    // console.log('type: ',type);
+    // if(user == "") user = 'user' 
+    // if(type == "") type = 'users'
+
     try {
-        const data = await mongoService.getTasks(username,key,value,sortOrder);
+        const data = await mongoService.getTasks(username,filter,value,sortOrder);
         return res.status(200).send(
             new ApiResponse(200,data)
         )
@@ -117,6 +133,7 @@ const taskController = {
     createTask,
     deleteTask,
     updateTask
+    
 }
 
 export default taskController
