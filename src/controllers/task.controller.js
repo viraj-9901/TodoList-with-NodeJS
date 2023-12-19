@@ -2,14 +2,15 @@ import { ApiError, handleError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"; 
 import mongoService from '../services/mongo.service.js';
-import moment from 'moment';
 
 
-moment().format();
+
+
 
 //get tasks of user
 const getTasks = asyncHandler(async (req,res) => {
     console.log(req.user._id);
+    const userId = req.user._id
 
     const filter = req.query.filter;
     let value = req.query.value;
@@ -34,7 +35,7 @@ const getTasks = asyncHandler(async (req,res) => {
     if(type == "") type = 'users'
 
     try {
-        const data = await mongoService.getTasks(username,filter,value,sortOrder,role,type);
+        const data = await mongoService.getTasks(userId,filter,value,sortOrder,role,type);
         return res.status(200).send(
             new ApiResponse(200,data)
         )
@@ -90,9 +91,10 @@ const createTask = asyncHandler( async(req,res) => {
 const deleteTask = asyncHandler(async (req,res) => {
     const userId = req.user._id
     const taskId = req.params.taskId
+    const role = req.user.role
 
     try {
-        const data = await mongoService.deleteTask(userId,taskId);
+        const data = await mongoService.deleteTask(userId,taskId,role);
 
         return res.status(200).send(
             new ApiResponse(200,data)

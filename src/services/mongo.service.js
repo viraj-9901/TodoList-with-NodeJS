@@ -54,8 +54,14 @@ const createTask = async (title, description, dueDate, priority, status, owner) 
 }
 
 //function: delete task
-const deleteTask = async (userId,taskId) => {
+const deleteTask = async (userId,taskId,role) => {
     try {
+
+        if(role == "admin"){
+            return await Task.deleteOne({
+                "_id": taskId
+            }) 
+        }
         return await Task.deleteOne({
             $and: [{"owner": userId}, {"_id": taskId}]
         }) 
