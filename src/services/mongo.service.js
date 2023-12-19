@@ -3,17 +3,14 @@ import { User } from "../models/user.model.js";
 import { ApiError, handleError } from "../utils/ApiError.js";
 
 //function: get task of user
-const getTasks = async (username,filter,value,sortOrder = 1) => {
+const getTasks = async (username,filter,value,sortOrder = 1,role,type) => {
     try {
         let filterOption = {}
         filterOption[filter] = value
 
-        let data = await User.findOne({username})
-        // console.log(data);
-
-        if(data.role == 'admin'){ 
+        if(role == 'admin'){ 
+            if(type == 'tasks') return await Task.find()
             return await User.find()
-            // return await Task.find()
         }
         if(Object.keys(filter).length == 0){
             return await Task.find({"owner": username})
@@ -28,10 +25,10 @@ const getTasks = async (username,filter,value,sortOrder = 1) => {
 }
 
 //function: get particular task of user
-const getOneTask = async (username,taskId) => {
+const getOneTask = async (userId,taskId) => {
     try {
         return await Task.findOne({
-            $and: [{"owner": username}, {"_id": taskId}]
+            $and: [{"owner": userId}, {"_id": taskId}]
         }) 
     } catch (error) {
         handleError(error,res)
@@ -57,10 +54,10 @@ const createTask = async (title, description, dueDate, priority, status, owner) 
 }
 
 //function: delete task
-const deleteTask = async (username,taskId) => {
+const deleteTask = async (userId,taskId) => {
     try {
         return await Task.deleteOne({
-            $and: [{"owner": username}, {"_id": taskId}]
+            $and: [{"owner": userId}, {"_id": taskId}]
         }) 
     } catch (error) {
         handleError(error,res)
@@ -68,11 +65,11 @@ const deleteTask = async (username,taskId) => {
 }
 
 //function: update task
-const updateTask = async (username,taskId,info) => {
+const updateTask = async (userId,taskId,info) => {
     try {
 
         const previousData = await Task.findOne({
-            $and: [{"owner": username}, {"_id": taskId}]
+            $and: [{"owner": userId}, {"_id": taskId}]
         })
         
         return await Task.updateOne(

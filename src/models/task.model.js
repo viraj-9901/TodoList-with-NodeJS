@@ -25,7 +25,7 @@ const taskSchema = new Schema({
         enum: ['pending','hold','completed']
     },
     owner:{
-        type: String,
+        type: Schema.Types.ObjectId,
         required: true
     }
 },{ timestamps: true })
