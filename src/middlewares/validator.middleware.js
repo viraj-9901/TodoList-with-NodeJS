@@ -1,15 +1,143 @@
-//import moment from 'moment';
-//import format from 'format'
 import passport from "passport";
 import { } from '../passport-config.js';
 import { ApiError, handleError } from "../utils/ApiError.js";
-// moment().format();
+import { User } from "../models/user.model.js";
 
 const validator = {
-    token : passport.authenticate('jwt', { session: false }), 
+    token : async(req,res,next) => {
+
+        try 
+        {
+            
+            passport.authenticate('jwt', { session: false },async (error, token) => {
+                if (error || !token) {
+                    return res.status(401).json({ message: 'Unauthorized Message' });
+                } 
+                try {
+                    console.log('token:',token)
+                    const user = await User.findOne(
+                        {_id: token._id}
+                    );
+                    req.user = user;
+                } catch (error) {
+                    next(error);
+                }
+                next();
+                
+            })(req,res,next);
+
+        } catch (error)
+        {
+            console.log('test');
+        }
+        
+}, 
+
+    user: async (req,res,next) => {
+        let {username, email, password, role} = req.body;
+
+        if(req.url === '/register'){
+            if([username, email, password].some(field => field === "" || field === undefined )){
+                return res.status(400).send(handleError(
+                    {
+                        statusCode: 400, 
+                        message: "all fields are required!", 
+                        errors: {
+                            RequiredField: "username, email, password"
+                        }
+                    }));
+            }
+        } else {
+            if([username, password].some((field) => field?.trim() === "" || field === undefined)){
+                return res.status(400).send(handleError(
+                    {
+                        statusCode: 400, 
+                        message: "username and password are required!", 
+                        errors: {
+                            RequiredField: "username, password"
+                        }
+                    }));
+            }
+        }
+
+        //username validation
+        if(/\s/.test(username)){
+            return res.status(400).send(handleError(
+                {
+                    statusCode: 400, 
+                    message: "username has white-space", 
+                    errors: {
+                        usernameFormat: "test1 or test@34"
+                    }
+                }));
+        }
+
+        //password validation
+        if(/\s/.test(password)){
+            return res.status(400).send(handleError(
+                {
+                    statusCode: 400, 
+                    message: "password has white-space", 
+                    errors: {
+                        passwordFormat: "test1@1234-56"
+                    }
+                }));
+        }
+
+        //email validation
+        if(email){
+            if(/\s/.test(email)){
+                return res.status(400).send(handleError(
+                    {
+                        statusCode: 400, 
+                        message: "email has white-space", 
+                        errors: {
+                            emailFormat: "test111@test34.com"
+                        }
+                    }));
+            }
+    
+            let emailRegex = /^[a-zA-Z0-9. _-]+@[a-zA-Z0-9. -]+\.[a-zA-Z]{2,4}$/ 
+            console.log('36');
+            console.log(emailRegex.test(email));
+            if(! emailRegex.test(email)){
+                return res.status(400).send(handleError(
+                    {
+                        statusCode: 400, 
+                        message: "email is invalid", 
+                        errors: {
+                            validEmailFormat: "xyz@abc.com"
+                        }
+                    }));
+            }
+        }
+        next()
+    },
+
+    // login: async (req,res,next) => {
+    //     console.log(req.method, req.url);
+
+    //     let {username, password} = req.body
+
+    //     if([username, password].some((field) => field?.trim() === "" || field === undefined)){
+    //         return res.status(400).send(handleError(
+    //             {
+    //                 statusCode: 400, 
+    //                 message: "username and password are required!", 
+    //                 errors: this.field
+    //             }));
+    //     }
+
+    //     //username validation
+    //     username = username.trim()
+
+    //     //password validation
+    //     password = password.trim()
+
+    //     next()
+    // }, 
 
     task : async (req,res,next) => {
-
         try {
              
             if(!req.body) {
@@ -18,34 +146,41 @@ const validator = {
                     {
                         statusCode: 400, 
                         message: "Missing request body", 
-                        errors: "test"
+                        errors: {
+                            message: "Doesn't get request body"
+                        }
                     }));
             }
             
-            let {title, description, dueDate, status, priority} = req.body; 
+            let {title, description, dueDate, status, priority} = req.body;
             
-            if([title, description, dueDate, priority, status].some((field) => field === "" || field === undefined))
-            {
-                return res.status(400).send(handleError(
-                    {
-                        statusCode: 400, 
-                        message: "all field required", 
-                        errors: "test"
-                    }));
-
-                //return res.status(400).send(new ApiError())
+            if(req.method === 'POST'){
+                if([title, description, dueDate, priority, status].some((field) => field === "" || field === undefined))
+                {
+                    return res.status(400).send(handleError(
+                        {
+                            statusCode: 400, 
+                            message: "all field required", 
+                            errors: {
+                                RequiredField: "title, description, dueDate, priority, status"
+                            }
+                        }));
+    
+                }
             }
             
             //title validation operation
             if(title) {
                 let titleLength = title.length
-                if(titleLength > 20 ) {
+                if(titleLength < 5 || titleLength > 20 ) {
                     //throw new ApiError(400,'title must be less than 20 letters')
                     return res.status(400).send(handleError(
                         {
                             statusCode: 400, 
-                            message: "title must be less than 20 letters", 
-                            errors: "test"
+                            message: "title must be less than 20 letters and greater than 5 letters", 
+                            errors: {
+                                message: "Length of title is must be in between the limit, limit is 5 to 20 letters"
+                            }
                         }));
                 }
             }
@@ -53,50 +188,81 @@ const validator = {
             //description validation operation
             if(description){
                 let descriptionLength = description.length
-                if(descriptionLength > 500){
-                    //throw new ApiError(400, 'description must be less than 500 letters')
+                if(descriptionLength < 5 || descriptionLength > 500){
                     return res.status(400).send(handleError(
                         {
                             statusCode: 400, 
-                            message: "description must be less than 500 letters", 
-                            errors: "test"
+                            message: "description must be less than 500 letters and greater than 5 letters", 
+                            errors: {
+                                message: "Length of description is must be in between the limit, limit is 5 to 500 letters"
+                            }
                         }));
                 }
             }
                 
             //due date validation operation
-            console.log(dueDate);
+            if(dueDate){
+                console.log(dueDate);
             
-            // let regex =/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
-            let regex = /(\d{4})-(\d{2})-(\d{2})/
+                let dateRegex =/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
                         
-            // let currentDate = new Date().toISOString().slice(0, 10);
-            let currentDate = new Date()
+                let currentDate = new Date()
             
-            let dueDateObject = new Date(dueDate)
+                if(!(String(dueDate).match(dateRegex))){
+                    return res.status(400).send(handleError(
+                        {
+                            statusCode: 400, 
+                            message: "invalid date format", 
+                            errors: {
+                                validFormat: "YYYY-MM-DD"
+                            }
+                        }));
+                    }
             
-            //if(! (String(dueDate).match(regex))) throw new ApiError(400,"date formate invalid")
-            
-            if(!(String(dueDate).match(regex))){
-                return res.status(400).send(handleError(
-                    {
-                        statusCode: 400, 
-                        message: "invalid date format", 
-                        errors: {
-                            validFormat: "YYYY-MM-DD"
-                        }
-                    }));
+                //dueDateObject is date object of dueDate 
+                let dueDateObject = new Date(dueDate)
+
+                if(dueDateObject < currentDate) {
+                    //res.status(400).send(new ApiError(400,'Current date is greater than due_date'))
+                    return res.status(400).send(handleError(
+                        {
+                            statusCode: 400, 
+                            message: "today's date is greater than dueDate", 
+                            errors: {
+                                message: "due date must be greater than today's date"
+                            }
+                        }));
+                }
             }
-                    
-            // if(dueDate < currentDate) throw new ApiError(400,'Current date is greater than due_date' )
-            if(dueDateObject < currentDate) {
-                //res.status(400).send(new ApiError(400,'Current date is greater than due_date'))
-                return res.status(400).send(handleError(
-                    {
-                        statusCode: 400, 
-                        message: "Current date is greater than dueDate", 
-                        errors: "test"
-                    }));
+
+            //priority validation
+            if(priority){
+                let priorityOptions = ['important','normal']
+                if(!(priorityOptions.includes(priority))){
+                    return res.status(400).send(handleError(
+                        {
+                            statusCode: 400, 
+                            message: "Priority must be important or normal", 
+                            errors: {
+                                message: "Priority must be select from ['important','normal']"
+                            }
+                        }));
+                }
+            }
+
+            //status validation
+            if(status){
+                let statusOptions = ['pending','hold','completed']
+                if(!(statusOptions.includes(status))){
+                    return res.status(400).send(handleError(
+                        {
+                            statusCode: 400, 
+                            message: "status must be pending or hold or completed", 
+                            errors: {
+                                message: "status must be select from ['pending','hold','completed']"
+                            }
+                        }));
+                }
             }
 
             next()
@@ -104,32 +270,8 @@ const validator = {
         } catch (error) {
             handleError(error)
         }
-    },
-
-    register: async (req,res,next) => {
-        const {username, email, password, role} = req.body
-        //check any element come empty from user
-        if([username, email, password].some((field) => field?.trim() === "" || field === undefined)){
-            throw new ApiError(400,"all field required!")
-        }
-
-        next()
-    },
-
-    login: async (req,res,next) => {
-        const {username, password} = req.body
-
-        //check any element come empty from user
-        if([username, password].some((field) => field?.trim() === "" || field === undefined)){
-            throw new ApiError(400,"username and password required!",['Error details'])
-        }
-
-        next()
-    },
-
-
-     
-
+    }
+ 
 }
 
 export {validator}

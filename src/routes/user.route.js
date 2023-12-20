@@ -9,11 +9,11 @@ const router = Router()
 
 //route: register user 
 router.route('/register')
-      .post(validator.register,registerUser);
+      .post(validator.user,registerUser);
 
 //route: login user 
 router.route('/login')
-      .post(validator.login,loginUser);
+      .post(validator.user,loginUser);
 
 //route: get tasks of user
 router.route('/:username').get(validator.token, taskController.getTasks)

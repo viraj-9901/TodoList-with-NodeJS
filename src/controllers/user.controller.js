@@ -8,18 +8,20 @@ const registerUser = asyncHandler(async (req,res) => {
     try {
         const {username, email, password, role} = req.body
 
-        // //check any element come empty from user
-        // if([username, email, password].some((field) => field?.trim() === "" || field === undefined)){
-        //     throw new ApiError(400,"all field required!")
-        // }
-
         //check: if user already exist or not
         const existUser = await User.findOne({
             $or: [{email},{username}]
         })
 
         if(existUser){
-            throw new ApiError(400, 'user with same username or email already existed')
+            return res.status(400).send(handleError(
+                {
+                    statusCode: 400, 
+                    message: "user with same username or email already existed", 
+                    errors: {
+                        error: "user with same username already name alreay exist in database"
+                    }
+                }));
         }
 
         //create new user in database
@@ -34,7 +36,16 @@ const registerUser = asyncHandler(async (req,res) => {
             "-password"
         )
 
-        if(!createdUser) throw new ApiError(500,'something went wrong while registoring user')
+        if(!createdUser) {
+            return res.status(500).send(handleError(
+                {
+                    statusCode: 500, 
+                    message: "something went wrong while registoring user", 
+                    errors: {
+                        error: "error occuring while creating new user in controller"
+                    }
+                }));
+        }
 
         //generate jwt token for user
         const token = await user.getAccessToken()

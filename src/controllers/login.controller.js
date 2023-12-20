@@ -20,14 +20,28 @@ const loginUser = asyncHandler( async (req,res) => {
         const user = await User.findOne({ username })
 
         if (user == null) {
-            throw new ApiError(404,'User not found')
+            return res.status(400).send(handleError(
+                {
+                    statusCode: 400, 
+                    message: "user not found", 
+                    errors: {
+                        error: "error occuring while find user with username and password in mongoService"
+                    }
+                }));
         }
 
         //check: password is correct or not
         const isPasswordMatch = await user.isPasswordCorrect(password);
         // console.log(isPasswordMatch);
         if (!isPasswordMatch) {
-            throw new ApiError(401,'username or password invalid!')  
+            return res.status(400).send(handleError(
+                {
+                    statusCode: 400, 
+                    message: "username or password incorrect", 
+                    errors: {
+                        error: "error occuring while find user with username and password in mongoService"
+                    }
+                })); 
         }
         
         //generate jwt token for user

@@ -9,7 +9,6 @@ import mongoService from '../services/mongo.service.js';
 
 //get tasks of user
 const getTasks = asyncHandler(async (req,res) => {
-    console.log(req.user._id);
     const userId = req.user._id
 
     const filter = req.query.filter;
@@ -24,18 +23,17 @@ const getTasks = asyncHandler(async (req,res) => {
         filter == "priority"? value = 'normal' : value = 'pending'
     }
 
-    const sort = req.query.sort;
-    let sortOrder = req.query.order;
-    if(sortOrder == "" || sortOrder == "asc"){
-        sortOrder = 1
-    } else { sortOrder = -1}
+    let sort = req.query.sort;
+    if(sort == "" || sort == "asc"){
+        sort = 1
+    } else { sort = -1}
 
     let role = req.user.role
     let type = req.query.type;
     if(type == "") type = 'users'
 
     try {
-        const data = await mongoService.getTasks(userId,filter,value,sortOrder,role,type);
+        const data = await mongoService.getTasks(userId,filter,value,sort,role,type);
         return res.status(200).send(
             new ApiResponse(200,data)
         )
