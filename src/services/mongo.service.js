@@ -3,22 +3,24 @@ import { User } from "../models/user.model.js";
 import { ApiError, handleError } from "../utils/ApiError.js";
 
 //function: get task of user
-const getTasks = async (userId,filter,value,sort = 1,role,type) => {
+const getTasks = async (userId,filter,value,sort = 1,role,type,limit,page) => {
     try {
         let filterOption = {}
         filterOption[filter] = value
 
+        let skip = limit * page;
+
         if(role == 'admin'){ 
-            if(type == 'tasks') return await Task.find()
-            return await User.find()
+            if(type == 'tasks') return await Task.find(filterOption).skip(skip).limit(limit)
+            return await User.find(filterOption).skip(skip).limit(limit)
         }
 
         if(Object.keys(filterOption).length == 0){
-            return await Task.find({owner: userId})
+            return await Task.find({owner: userId}).skip(skip).limit(limit)
         } else {
             return await Task.find({
                 $and: [{owner: userId}, filterOption]
-            }).sort({dueDate: sort})
+            }).sort({dueDate: sort}).skip(skip).limit(limit)
         }
     } catch (error) {
         handleError(error,res)
