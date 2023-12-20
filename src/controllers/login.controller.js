@@ -25,7 +25,7 @@ const loginUser = asyncHandler( async (req,res) => {
                     statusCode: 400, 
                     message: "user not found", 
                     errors: {
-                        error: "error occuring while find user with username and password in mongoService"
+                        error: "error occuring while find user with username and password"
                     }
                 }));
         }

@@ -72,26 +72,38 @@ const deleteTask = async (userId,taskId,role) => {
 }
 
 //function: update task
-const updateTask = async (userId,taskId,info) => {
+const updateTask = async (userId,taskId,info,userRole) => {
     try {
-        const previousData = await Task.findOne({
-            $and: [{owner: userId}, {_id: taskId}]
-        })
+        const previousData = await Task.findOne({_id: taskId})
 
-        return await Task.updateOne(
-            {
-                $and: [{owner: userId}, {_id: taskId}]
-            },
-            {
-                $set : {
-                    title: info.title || previousData.title,
-                    description: info.description || previousData.description,
-                    dueDate: info.dueDate || previousData.duDate,
-                    priority: info.priority || previousData.priority,
-                    status: info.status || previousData.status
-                }
-            }            
-        )
+        async function updatePerform() {
+            return await Task.updateOne(
+                {
+                    _id: taskId
+                },
+                {
+                    $set : {
+                        title: info.title || previousData.title,
+                        description: info.description || previousData.description,
+                        dueDate: info.dueDate || previousData.duDate,
+                        priority: info.priority || previousData.priority,
+                        status: info.status || previousData.status
+                    }
+                }          
+            )
+        }
+        
+        if(userId.equals(previousData.owner)){
+            return updatePerform() 
+        }else if(userRole == "admin"){
+            return updatePerform()
+        }else {
+            let message = {
+                message: "you are not allowed to update this task"
+            }
+
+            return message
+        }
     } catch (error) {
         handleError(error,res)
         

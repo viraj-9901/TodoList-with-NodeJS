@@ -7,24 +7,52 @@ const validator = {
     token : async(req,res,next) => {
 
         try 
-        {
+        {   
+            const routeUsername = req.params.username;
             
-            passport.authenticate('jwt', { session: false },async (error, token) => {
+            let authenticateReturnFun = passport.authenticate('jwt', { session: false },async (error, token) => {
                 if (error || !token) {
-                    return res.status(401).json({ message: 'Unauthorized Message' });
+                    return res.status(401).send(handleError({
+                        statusCode: 401,
+                        message: "You are not authenticate",
+                        errors:{
+                            message: "Invalid or wrong token pass in header"
+                        }
+                    }))
                 } 
                 try {
-                    console.log('token:',token)
+                    // console.log('token:',token)
                     const user = await User.findOne(
                         {_id: token._id}
                     );
                     req.user = user;
+                    
+                    const tokenUsername = req.user.username;
+
+                    if(! (routeUsername === tokenUsername)){
+
+                        // if(req.user.role == "admin"){
+                        //     return;
+                        // }
+                        
+                        return res.status(400).send(
+                            handleError({
+                                statusCode: 400,
+                                message: "Invalid request",
+                                errors:{
+                                    message: "username from route and token doesn't match"
+                                }
+                            })
+                        )
+                    }
                 } catch (error) {
                     next(error);
                 }
                 next();
                 
-            })(req,res,next);
+            });
+
+            authenticateReturnFun(req,res,next);
 
         } catch (error)
         {
