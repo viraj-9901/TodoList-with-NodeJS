@@ -303,7 +303,8 @@ const validator = {
             }
 
             //files validation 
-            if(req.files.length > 3){
+            let filesLength = req.files.length
+            if(filesLength > 3){
                 return res.status(400).send(handleError(
                     {
                         statusCode: 400, 
@@ -313,6 +314,24 @@ const validator = {
                         }
                     }));
             }
+            let fileExtension = req.files?.files[0]?.mimetype;
+
+            let validExtension = ['file/pdf','file/mpp','file/mpt','file/doc','file/docm','file/docx','file/ppt','file/pptm','file/pptx'];
+            for(let i = 0; i < filesLength; i++){
+                let fileExtension = req.files?.files[0]?.mimetype;
+
+                if(! validExtension.includes(fileExtension)){
+                        return res.status(400).send(handleError({
+                            statusCode: 400, 
+                            message: "file must be from .pdf, .doc, .docx, .ppt, .pptm, .pptx, .mpp, .mpt", 
+                            errors: {
+                                error: "Extension of file is wrong"
+                            }
+                        }))
+                    }
+            }
+
+
 
             next()
             
