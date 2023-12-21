@@ -27,6 +27,9 @@ const taskSchema = new Schema({
     owner:{
         type: Schema.Types.ObjectId,
         required: true
+    },
+    files:{
+        type: String
     }
 },{ timestamps: true })
 

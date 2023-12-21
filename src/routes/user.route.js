@@ -16,7 +16,8 @@ router.route('/login')
       .post(validator.user,loginUser);
 
 //route: get tasks of user
-router.route('/:username').get(validator.token, taskController.getTasks)
+router.route('/:username')
+      .get(validator.token, taskController.getTasks)
 
 //route: get perticular task of user
 router.route('/:username/:taskId')
@@ -24,7 +25,7 @@ router.route('/:username/:taskId')
 
 //route: (post) add task 
 router.route('/:username')
-      .post([validator.token,validator.task,upload.array('files',5)], taskController.createTask)
+      .post([validator.token, upload.fields([{name:'files', maxCount: 3}]),validator.task], taskController.createTask);
 
 //route: delete task from user
 router.route('/:username/:taskId')
@@ -32,8 +33,9 @@ router.route('/:username/:taskId')
 
 //route: update particular task
 router.route('/:username/:taskId')
-      .put([validator.token,validator.task],taskController.updateTask);
+      .put([validator.token, upload.fields([{name:'files', maxCount: 3}]),validator.task],taskController.updateTask);
 
+      // [upload.fields([{name:'files', maxCount: 3}]
 //route: Admin 
 //router.route('/admin/:username',validator.token).get(taskController.getAllData)
 

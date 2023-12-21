@@ -30,11 +30,6 @@ const validator = {
                     const tokenUsername = req.user.username;
 
                     if(! (routeUsername === tokenUsername)){
-
-                        // if(req.user.role == "admin"){
-                        //     return;
-                        // }
-                        
                         return res.status(400).send(
                             handleError({
                                 statusCode: 400,
@@ -48,7 +43,7 @@ const validator = {
                 } catch (error) {
                     next(error);
                 }
-                console.log('test 51');
+                
                 next();
                 
             });
@@ -65,7 +60,7 @@ const validator = {
     user: async (req,res,next) => {
 
         let {username, email, password, role} = req.body;
-        
+
         if(req.url === '/register'){
             if([username, email, password].some(field => field === "" || field === undefined )){
                 return res.status(400).send(handleError(
@@ -127,9 +122,8 @@ const validator = {
                     }));
             }
     
-            let emailRegex = /^[a-zA-Z0-9. _-]+@[a-zA-Z0-9. -]+\.[a-zA-Z]{2,4}$/ 
-            console.log('36');
-            console.log(emailRegex.test(email));
+            let emailRegex = /^[a-zA-Z0-9. _+-]+@[a-zA-Z0-9. -]+\.[a-zA-Z]{2,4}$/ 
+    
             if(! emailRegex.test(email)){
                 return res.status(400).send(handleError(
                     {
@@ -140,6 +134,19 @@ const validator = {
                         }
                     }));
             }
+        }
+
+        let validExtension = ['image/png','image/jpg','image/jpe','image/jpeg'];
+        let profileExtension = req.files?.profile[0]?.mimetype;
+        console.log(validExtension.includes(profileExtension));
+        if(! validExtension.includes(profileExtension)){
+            return res.status(400).send(handleError({
+                statusCode: 400, 
+                message: "Profile image must be from .jpg, .jpeg, .png or .jpe", 
+                errors: {
+                    error: "Extension of profile image is wrong"
+                }
+            }))
         }
         next()
     },
@@ -169,7 +176,7 @@ const validator = {
 
     task : async (req,res,next) => {
         try {
-             
+
             if(!req.body) {
                 // throw new ApiError(400,'Missing request body')
                 return res.status(400).send(handleError(
@@ -293,6 +300,18 @@ const validator = {
                             }
                         }));
                 }
+            }
+
+            //files validation 
+            if(req.files.length > 3){
+                return res.status(400).send(handleError(
+                    {
+                        statusCode: 400, 
+                        message: "You only upload 3 or less files", 
+                        errors: {
+                            message: "More than 3 files uploaded"
+                        }
+                    }));
             }
 
             next()

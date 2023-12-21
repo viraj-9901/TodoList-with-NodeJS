@@ -11,7 +11,6 @@ const opts = {
 
 passport.use(new Strategy(opts, async (jwt_payload,next) => {
     const user = await User.findOne({_id: jwt_payload._id})
-    console.log('token');
     if(user) {
         return next(null,user);
     }else{

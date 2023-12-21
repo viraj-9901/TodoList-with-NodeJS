@@ -44,7 +44,6 @@ const getTasks = asyncHandler(async (req,res) => {
     page = parseInt(page)
     page = page - 1;
 
-
     try {
         const data = await mongoService.getTasks(userId,filter,value,sort,role,type,limit,page);
         return res.status(200).send(
