@@ -3,13 +3,13 @@ import { registerUser } from "../controllers/user.controller.js";
 import { loginUser } from "../controllers/login.controller.js";
 import taskController from "../controllers/task.controller.js";
 import { validator } from "../middlewares/validator.middleware.js";
-// import { } from '../passport-config.js';
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router()
 
 //route: register user 
 router.route('/register')
-      .post(validator.user,registerUser);
+      .post([upload.fields([{name: 'profile', maxCount: 1}]),validator.user],registerUser);
 
 //route: login user 
 router.route('/login')
@@ -24,7 +24,7 @@ router.route('/:username/:taskId')
 
 //route: (post) add task 
 router.route('/:username')
-      .post([validator.token,validator.task], taskController.createTask)
+      .post([validator.token,validator.task,upload.array('files',5)], taskController.createTask)
 
 //route: delete task from user
 router.route('/:username/:taskId')

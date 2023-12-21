@@ -48,6 +48,7 @@ const validator = {
                 } catch (error) {
                     next(error);
                 }
+                console.log('test 51');
                 next();
                 
             });
@@ -62,8 +63,9 @@ const validator = {
 }, 
 
     user: async (req,res,next) => {
-        let {username, email, password, role} = req.body;
 
+        let {username, email, password, role} = req.body;
+        
         if(req.url === '/register'){
             if([username, email, password].some(field => field === "" || field === undefined )){
                 return res.status(400).send(handleError(
@@ -230,7 +232,7 @@ const validator = {
                 
             //due date validation operation
             if(dueDate){
-                console.log(dueDate);
+                // console.log(dueDate);
             
                 let dateRegex =/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
                         

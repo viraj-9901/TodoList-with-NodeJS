@@ -18,6 +18,9 @@ const userSchema = new Schema({
         lowerCase: true,
         unique: true,
     },
+    profile:{
+        type: String
+    },
     role:{
         type:String,
         default: 'user'
