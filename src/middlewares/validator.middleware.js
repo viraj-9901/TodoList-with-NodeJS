@@ -137,16 +137,20 @@ const validator = {
         }
 
         let validExtension = ['image/png','image/jpg','image/jpe','image/jpeg'];
-        let profileExtension = req.files?.profile[0]?.mimetype;
-        console.log(validExtension.includes(profileExtension));
-        if(! validExtension.includes(profileExtension)){
-            return res.status(400).send(handleError({
-                statusCode: 400, 
-                message: "Profile image must be from .jpg, .jpeg, .png or .jpe", 
-                errors: {
-                    error: "Extension of profile image is wrong"
-                }
-            }))
+
+        if(req.files.profile.length > 0){
+            console.log('142');
+            let profileExtension = req.files?.profile[0]?.mimetype;
+            console.log(validExtension.includes(profileExtension));
+            if(! validExtension.includes(profileExtension)){
+                return res.status(400).send(handleError({
+                    statusCode: 400, 
+                    message: "Profile image must be from .jpg, .jpeg, .png or .jpe", 
+                    errors: {
+                        error: "Extension of profile image is wrong"
+                    }
+                }))
+            }
         }
         next()
     },
@@ -303,7 +307,7 @@ const validator = {
             }
 
             //files validation 
-            let filesLength = req.files.length
+            let filesLength = req.files.files.length
             if(filesLength > 3){
                 return res.status(400).send(handleError(
                     {
@@ -316,14 +320,16 @@ const validator = {
             }
             let fileExtension = req.files?.files[0]?.mimetype;
 
-            let validExtension = ['file/pdf','file/mpp','file/mpt','file/doc','file/docm','file/docx','file/ppt','file/pptm','file/pptx'];
+            console.log(req.files);
+
+            let validExtension = ['file/pdf','file/mpp','file/mpt','file/doc','file/docm','file/docx','file/ppt','file/pptm','file/pptx','text/plain'];
             for(let i = 0; i < filesLength; i++){
-                let fileExtension = req.files?.files[0]?.mimetype;
+                let fileExtension = req.files?.files[i]?.mimetype;
 
                 if(! validExtension.includes(fileExtension)){
                         return res.status(400).send(handleError({
                             statusCode: 400, 
-                            message: "file must be from .pdf, .doc, .docx, .ppt, .pptm, .pptx, .mpp, .mpt", 
+                            message: "file must be from .pdf, .doc, .txt, .docx, .ppt, .pptm, .pptx, .mpp, .mpt", 
                             errors: {
                                 error: "Extension of file is wrong"
                             }

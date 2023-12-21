@@ -7,7 +7,7 @@ const registerUser = asyncHandler(async (req,res) => {
 
     try {
         const {username, email, password, role} = req.body
-        console.log(req.files?.profile[0]?.mimetype)
+        // console.log(req.files?.profile[0]?.mimetype)
 
         // let validExtension = ['image/png','image/jpg','image/jpe','image/jpeg'];
         // let profileExtension = req.files?.profile[0]?.mimetype;

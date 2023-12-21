@@ -13,7 +13,7 @@ router.route('/register')
 
 //route: login user 
 router.route('/login')
-      .post(validator.user,loginUser);
+      .post([upload.fields([{name: 'profile', maxCount: 1}]),validator.user],loginUser);
 
 //route: get tasks of user
 router.route('/:username')
@@ -38,6 +38,15 @@ router.route('/:username/:taskId')
       // [upload.fields([{name:'files', maxCount: 3}]
 //route: Admin 
 //router.route('/admin/:username',validator.token).get(taskController.getAllData)
+
+//route: refresh 
+router.route('/:username/refresh')
+      .post(validator.token,(req,res) => {
+            console.log(req.user);
+            console.log(req.headers.authorization);
+
+              
+      })
 
 export default router
 

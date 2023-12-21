@@ -8,13 +8,6 @@ const loginUser = asyncHandler( async (req,res) => {
     try {
         
         const {username, password, role} = req.body;
-
-        // console.log(req.body);
-
-        //check: empty and undefined username and password 
-        // if([username, password].some((field) => field?.trim() === "" || field === undefined)){
-        //     throw new ApiError(400,"username and password required!",['Error details']);
-        // }
   
         //checreqk: user with username available in database or not
         const user = await User.findOne({ username })
@@ -46,21 +39,14 @@ const loginUser = asyncHandler( async (req,res) => {
         
         //generate jwt token for user
         const token = await user.getAccessToken()
-        
-        //check for admin
-        // if(user.role == "admin") {
-        //     return res.status(200)
-        //     .send({
-        //         // new ApiResponse(201,'Login Successfully as Admin',token,user),
-        //         redirect: "/user/admin"
-        // })
-            
-        // }
+        const refreshToken = await user.getRefreshToken()
 
+        
         return res.status(200).send(
             new ApiResponse(201,'Login Successfully',token,user)
-        )
-
+        ).json({
+            cookie: refreshToken
+        })
     } catch (error) {
         handleError(error,res)
     }
