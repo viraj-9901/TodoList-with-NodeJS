@@ -27,7 +27,7 @@ const validator = {
                         {_id: token._id}
                     );
                     req.user = user;
-                    
+                 
                     const tokenUsername = req.user.username;
 
                     if(! (routeUsername === tokenUsername)){
@@ -41,19 +41,19 @@ const validator = {
                             })
                         )
                     }
+                    next()
                 } catch (error) {
+                    // console.log('test-47');
                     next(error);
                 }
                 
-                next();
-                
             });
-
             authenticateReturnFun(req,res,next);
 
         } catch (error)
         {
             console.log('test');
+            // next()
         }
         
     }, 
@@ -157,9 +157,7 @@ const validator = {
         }
 
         let validExtension = ['image/png','image/jpg','image/jpe','image/jpeg'];
-
-        if(req.files.profile.length > 0){
-            console.log('142');
+        if(req.files.profile){
             let profileExtension = req.files?.profile[0]?.mimetype;
             console.log(validExtension.includes(profileExtension));
             if(! validExtension.includes(profileExtension)){

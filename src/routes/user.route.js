@@ -35,5 +35,8 @@ router.route('/:username/:taskId')
 router.route('/:username/:taskId')
       .put([validator.token, upload.fields([{name:'files', maxCount: 3}]),validator.task],taskController.updateTask);
 
+//route: download file
+router.route('/:username/file/:filename')
+      .get(validator.token, taskController.downloadFile)
 export default router
 

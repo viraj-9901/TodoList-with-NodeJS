@@ -2,7 +2,7 @@ import { ApiError, handleError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"; 
 import mongoService from '../services/mongo.service.js';
-
+import fs from 'fs'
 
 
 
@@ -77,7 +77,7 @@ const createTask = asyncHandler( async(req,res) => {
     const {title, description, dueDate, status, priority} = req.body;
     const owner = req.user._id
     const fileList = req.files.files
-    
+   
     let files = []
     for(let i =0; i < fileList.length; i++){
         let fileName =  fileList[i].filename
@@ -141,13 +141,22 @@ const updateTask = asyncHandler(async (req,res) => {
     }
 })
 
+//download file
+const downloadFile = asyncHandler( async(req,res) => {
+
+    let filePath = '/home/comp-167/Desktop/Viraj/TodoList-with-NodeJS/Public/files/'+req.user.username+'_'+req.params.filename;
+    console.log(filePath);
+    return res.download(filePath)
+   
+})
 
 const taskController = {
     getTasks,
     getOneTask,
     createTask,
     deleteTask,
-    updateTask
+    updateTask,
+    downloadFile
     
 }
 

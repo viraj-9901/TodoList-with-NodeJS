@@ -39,4 +39,12 @@ const taskSchema = new Schema({
     }]
 },{ timestamps: true })
 
+taskSchema.pre('save', async function(req,res,next){
+    if(this.files && this.isModified('files')){
+        console.log('files name change');
+        console.log('file names: ', this.files);
+        console.log(req.files);
+    }
+})
+
 export const Task = mongoose.model("Task", taskSchema)
