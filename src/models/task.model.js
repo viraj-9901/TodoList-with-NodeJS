@@ -1,5 +1,11 @@
 import {mongoose, Schema} from "mongoose";
 
+// const fileSchema = new Schema({
+//     files:{
+//         type:String
+//     }
+// })
+
 const taskSchema = new Schema({
     title:{
         type:String,
@@ -28,9 +34,9 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    files:{
+    files:[{
         type: String
-    }
+    }]
 },{ timestamps: true })
 
 export const Task = mongoose.model("Task", taskSchema)

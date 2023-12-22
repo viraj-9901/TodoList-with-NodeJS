@@ -2,6 +2,7 @@ import passport from "passport";
 import { } from '../passport-config.js';
 import { ApiError, handleError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
+// import Jwt from "jsonwebtoken";
 
 const validator = {
     token : async(req,res,next) => {
@@ -55,7 +56,26 @@ const validator = {
             console.log('test');
         }
         
-}, 
+    }, 
+
+    // refreshToken: async (email, refreshToken) => {
+    //     try {
+    //         const decode = Jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+    
+    //         return decode.email === email
+            
+    //     } catch (error) {
+    //        return res.status(400).send(handleError({
+    //         statusCode: 400,
+    //         message: "refresh token in invalid",
+    //         errors:{
+    //             message: "refreshToken either expire or invalid"
+    //         }
+    //        })) 
+    //     } 
+        
+         
+    // },
 
     user: async (req,res,next) => {
 

@@ -76,6 +76,13 @@ const createTask = asyncHandler( async(req,res) => {
     // console.log(req.user);
     const {title, description, dueDate, status, priority} = req.body;
     const owner = req.user._id
+    const fileList = req.files.files
+    
+    let files = []
+    for(let i =0; i < fileList.length; i++){
+        let fileName =  fileList[i].filename
+        files.push(fileName)
+    }
 
     try {
         const data = await mongoService.createTask(
@@ -84,7 +91,8 @@ const createTask = asyncHandler( async(req,res) => {
             dueDate, 
             priority,  
             status,
-            owner
+            owner,
+            files
         );
         
         return res.status(200).send(

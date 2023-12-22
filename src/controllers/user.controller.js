@@ -7,23 +7,8 @@ const registerUser = asyncHandler(async (req,res) => {
 
     try {
         const {username, email, password, role} = req.body
-        // console.log(req.files?.profile[0]?.mimetype)
-
-        // let validExtension = ['image/png','image/jpg','image/jpe','image/jpeg'];
-        // let profileExtension = req.files?.profile[0]?.mimetype;
-        // console.log(validExtension.includes(profileExtension));
-        // if(! validExtension.includes(profileExtension)){
-        //     return res.status(400).send(handleError({
-        //         statusCode: 400, 
-        //         message: "Profile image must be from .jpg, .jpeg, .png or .jpe", 
-        //         errors: {
-        //             error: "Extension of profile image is wrong"
-        //         }
-        //     }))
-        // }
 
         //check: if user already exist or not
-       
         const existUser = await User.findOne({
             $or: [{email},{username}]
         })

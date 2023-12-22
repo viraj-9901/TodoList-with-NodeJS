@@ -35,18 +35,5 @@ router.route('/:username/:taskId')
 router.route('/:username/:taskId')
       .put([validator.token, upload.fields([{name:'files', maxCount: 3}]),validator.task],taskController.updateTask);
 
-      // [upload.fields([{name:'files', maxCount: 3}]
-//route: Admin 
-//router.route('/admin/:username',validator.token).get(taskController.getAllData)
-
-//route: refresh 
-router.route('/:username/refresh')
-      .post(validator.token,(req,res) => {
-            console.log(req.user);
-            console.log(req.headers.authorization);
-
-              
-      })
-
 export default router
 
