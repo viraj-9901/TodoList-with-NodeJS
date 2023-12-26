@@ -11,7 +11,7 @@ const validator = {
         {   
             const routeUsername = req.params.username;
             
-            let authenticateReturnFun = passport.authenticate('jwt', { session: false },async (error, token) => {
+            let authenticateReturnFun = passport.authenticate('jwt', { session: false }, async (error, token) => {
                 if (error || !token) {
                     return res.status(401).send(handleError({
                         statusCode: 401,
@@ -21,6 +21,7 @@ const validator = {
                         }
                     }))
                 } 
+                
                 try {
                 
                     const user = await User.findOne(
@@ -29,7 +30,7 @@ const validator = {
                     req.user = user;
                  
                     const tokenUsername = req.user.username;
-
+                    
                     if(! (routeUsername === tokenUsername)){
                         return res.status(400).send(
                             handleError({
@@ -178,7 +179,7 @@ const validator = {
 
     task : async (req,res,next) => {
         try {
-
+           
             if(!req.body) {
                 // throw new ApiError(400,'Missing request body')
                 return res.status(400).send(handleError(
@@ -192,10 +193,12 @@ const validator = {
             }
             
             let {title, description, dueDate, status, priority} = req.body;
-            
+           
             if(req.method === 'POST'){
-                if([title, description, dueDate, priority, status].some((field) => field === "" || field === undefined))
+                
+                if([title, description, dueDate, priority, status].some((field) => field === "" || field === undefined))  
                 {
+                 
                     return res.status(400).send(handleError(
                         {
                             statusCode: 400, 
@@ -223,7 +226,7 @@ const validator = {
                         }));
                 }
             }
-            
+           
             //description validation operation
             if(description){
                 let descriptionLength = description.length
@@ -273,7 +276,7 @@ const validator = {
                         }));
                 }
             }
-
+            
             //priority validation
             if(priority){
                 let priorityOptions = ['important','normal']
@@ -303,38 +306,37 @@ const validator = {
                         }));
                 }
             }
+        
+            //files validation
+            if(req.files.files) {
+                let filesLength = req.files.files.length
 
-            //files validation 
-            let filesLength = req.files.files.length
-            if(filesLength > 3){
-                return res.status(400).send(handleError(
-                    {
-                        statusCode: 400, 
-                        message: "You only upload 3 or less files", 
-                        errors: {
-                            message: "More than 3 files uploaded"
-                        }
-                    }));
-            }
-            let fileExtension = req.files?.files[0]?.mimetype;
-
-            console.log(req.files);
-
-            let validExtension = ['file/pdf','file/mpp','file/mpt','file/doc','file/docm','file/docx','file/ppt','file/pptm','file/pptx','text/plain'];
-            for(let i = 0; i < filesLength; i++){
-                let fileExtension = req.files?.files[i]?.mimetype;
-
-                if(! validExtension.includes(fileExtension)){
-                        return res.status(400).send(handleError({
+                if(filesLength > 3){
+                    return res.status(400).send(handleError(
+                        {
                             statusCode: 400, 
-                            message: "file must be from .pdf, .doc, .txt, .docx, .ppt, .pptm, .pptx, .mpp, .mpt", 
+                            message: "You only upload 3 or less files", 
                             errors: {
-                                error: "Extension of file is wrong"
+                                message: "More than 3 files uploaded"
                             }
-                        }))
-                    }
-            }
+                        }));
+                }
+          
+                let validExtension = ['file/pdf','file/mpp','file/mpt','file/doc','file/docm','file/docx','file/ppt','file/pptm','file/pptx','text/plain'];
+                for(let i = 0; i < filesLength; i++){
+                    let fileExtension = req.files?.files[i]?.mimetype;
 
+                    if(! validExtension.includes(fileExtension)){
+                            return res.status(400).send(handleError({
+                                statusCode: 400, 
+                                message: "file must be from .pdf, .doc, .txt, .docx, .ppt, .pptm, .pptx, .mpp, .mpt", 
+                                errors: {
+                                    error: "Extension of file is wrong"
+                                }
+                            }))
+                        }
+                }
+            }
 
 
             next()

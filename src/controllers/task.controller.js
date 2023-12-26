@@ -73,24 +73,23 @@ const getOneTask = asyncHandler( async (req,res) => {
 
 //add task to particular user
 const createTask = asyncHandler( async(req,res) => {
-    // console.log(req.user);
-    const {title, description, dueDate, status, priority} = req.body;
+    const info = req.body;
     const owner = req.user._id
-    const fileList = req.files.files
-   
     let files = []
-    for(let i =0; i < fileList.length; i++){
-        let fileName =  fileList[i].filename
-        files.push(fileName)
-    }
 
+    if(req.files.files){
+        const fileList = req.files.files
+
+        for(let i =0; i < fileList.length; i++){
+            let fileName =  fileList[i].filename
+            files.push(fileName)
+        }
+    }
+   
+   
     try {
         const data = await mongoService.createTask(
-            title, 
-            description, 
-            dueDate, 
-            priority,  
-            status,
+            info,
             owner,
             files
         );

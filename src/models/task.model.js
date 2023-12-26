@@ -41,9 +41,6 @@ const taskSchema = new Schema({
 
 taskSchema.pre('save', async function(req,res,next){
     if(this.files && this.isModified('files')){
-        console.log('files name change');
-        console.log('file names: ', this.files);
-        console.log(req.files);
     }
 })
 
