@@ -1,9 +1,10 @@
 class ApiResponse{
-    constructor(statusCode,message= "success",token,data){
-        if(token == "") this.token = token
+    // constructor(statusCode,message= "success",token,data){
+    constructor(statusCode,message= "success",data){
+        // if(token == "") this.token = token
         
         this.statusCode = statusCode
-        this.token = token
+        // this.token = token
         this.data = data
         this.message = message
         this.success = statusCode < 400

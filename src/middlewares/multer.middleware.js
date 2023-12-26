@@ -5,8 +5,9 @@ const storage = multer.diskStorage({
     cb(null, './Public/files')
   },
   filename: function (req, file, cb) {
-    cb(null, req.user.username + '_' + file.originalname)
-    // cb(null, file.originalname)
+    
+    // cb(null, req.user.username + '_' + file.originalname)
+    cb(null, file.originalname)
   }
 })
 

@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/user.controller.js";
-import { loginUser } from "../controllers/login.controller.js";
+import { registerUser, loginUser, logOutUser, refreshAccessToken } from "../controllers/user.controller.js";
 import taskController from "../controllers/task.controller.js";
 import { validator } from "../middlewares/validator.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import {verifyJWT} from "../middlewares/auth.middleware.js"
 
 const router = Router()
 
@@ -14,6 +14,14 @@ router.route('/register')
 //route: login user 
 router.route('/login')
       .post([upload.fields([{name: 'profile', maxCount: 1}]),validator.user],loginUser);
+
+//route: logout user
+router.route('/logout')
+      .post(verifyJWT, logOutUser)
+
+//route: refresh access token
+router.route('/refresh-token')
+      .get(refreshAccessToken)
 
 //route: get tasks of user
 router.route('/:username')

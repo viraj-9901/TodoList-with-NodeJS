@@ -43,7 +43,6 @@ const validator = {
                     }
                     next()
                 } catch (error) {
-                    // console.log('test-47');
                     next(error);
                 }
                 
