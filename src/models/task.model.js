@@ -35,7 +35,10 @@ const taskSchema = new Schema({
         required: true
     },
     files:[{
-        type: String
+        type: Object
+    }],
+    originalFiles:[{
+        type: Object
     }]
 },{ timestamps: true })
 

@@ -75,23 +75,26 @@ const getOneTask = asyncHandler( async (req,res) => {
 const createTask = asyncHandler( async(req,res) => {
     const info = req.body;
     const owner = req.user._id
+    // console.log('userFiles(w/o change): ',req.user.userFiles);
     let files = []
+    let originalFiles = []
 
     if(req.files.files){
         const fileList = req.files.files
 
         for(let i =0; i < fileList.length; i++){
-            let fileName =  fileList[i].filename
-            files.push(fileName)
+            let file =  fileList[i]
+            files.push(file.filename)
+            originalFiles.push(file.originalname)
         }
     }
-   
    
     try {
         const data = await mongoService.createTask(
             info,
             owner,
-            files
+            files,
+            originalFiles
         );
         
         return res.status(200).send(

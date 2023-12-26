@@ -39,7 +39,7 @@ const getOneTask = async (userId,taskId) => {
 }
 
 //function: create task for user
-const createTask = async (info, owner, files) => {
+const createTask = async (info, owner, files, originalFiles) => {
     try {
         const task = await Task.create({
             title: info.title, 
@@ -48,8 +48,9 @@ const createTask = async (info, owner, files) => {
             priority: info.priority,  
             status: info.status,
             owner,
-            files
-    }) 
+            files: files,
+            originalFiles: originalFiles
+        }) 
         return task
     } catch (error) {
         // handleError(error)
