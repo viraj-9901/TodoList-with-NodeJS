@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, logOutUser, refreshAccessToken } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser } from "../controllers/user.controller.js";
 import taskController from "../controllers/task.controller.js";
 import { validator } from "../middlewares/validator.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -18,6 +18,10 @@ router.route('/login')
 //route: logout user
 router.route('/logout')
       .post(verifyJWT, logOutUser)
+
+//route: update user
+router.route('/:username')
+      .put([verifyJWT, upload.fields([{name:'portfile', maxCount: 1}]), validator.user], updateUser)
 
 //route: refresh access token
 router.route('/refresh-token')

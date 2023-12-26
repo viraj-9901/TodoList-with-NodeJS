@@ -113,12 +113,39 @@ const updateTask = async (userId,taskId,info,userRole) => {
     }
 }
 
+const updateUser = async(userId, info) => {
+    try {
+        const user = await User.findById(userId);
+
+        return await User.updateOne(
+            {
+                _id: userId
+            },
+            {
+                $set:{
+                    username: info.username || user.username,
+                    email: info.email || user.email,
+                    role: info.role || user.role,
+                    password: info.password || user.password
+
+                }
+            },
+            {
+                new: true
+            }
+        )
+    } catch (error) {
+        handleError(error,res)
+    }
+}
+
 const mongoService = {
     getTasks,
     getOneTask,
     createTask,
     deleteTask,
     updateTask,
+    updateUser
 }
 
 export default mongoService

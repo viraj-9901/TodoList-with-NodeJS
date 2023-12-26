@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import mongoService from "../services/mongo.service.js";
 import { ApiError, handleError } from "../utils/ApiError.js";
 import {ApiResponse} from '../utils/ApiResponse.js';
 import {asyncHandler} from '../utils/asyncHandler.js';
@@ -250,9 +251,30 @@ const refreshAccessToken = asyncHandler(async (req,res) => {
 
 
 })
+
+const updateUser = asyncHandler(async (req,res) => {
+    const info = req.body;
+    const userId = req.user._id
+
+    const user = await mongoService.updateUser(userId, info);
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                "User update Successfully",
+                {
+                    user: user
+                }
+            )
+        )
+})
+
 export {
     registerUser,
     loginUser,
     logOutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    updateUser
 }
