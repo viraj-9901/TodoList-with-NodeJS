@@ -75,17 +75,22 @@ const getOneTask = asyncHandler( async (req,res) => {
 const createTask = asyncHandler( async(req,res) => {
     const info = req.body;
     const owner = req.user._id
-    // console.log('userFiles(w/o change): ',req.user.userFiles);
-    let files = []
-    let originalFiles = []
-
+    let files = [];
+    
     if(req.files.files){
         const fileList = req.files.files
 
         for(let i =0; i < fileList.length; i++){
             let file =  fileList[i]
-            files.push(file.filename)
-            originalFiles.push(file.originalname)
+            let userFile = file.originalname
+            let originalFile = file.filename
+            
+            let temp = {
+                userFileName: userFile,
+                originalFileName: originalFile
+            }
+            files.push(temp)
+            
         }
     }
    
@@ -94,7 +99,7 @@ const createTask = asyncHandler( async(req,res) => {
             info,
             owner,
             files,
-            originalFiles
+            // originalFiles
         );
         
         return res.status(200).send(
@@ -146,8 +151,9 @@ const updateTask = asyncHandler(async (req,res) => {
 //download file
 const downloadFile = asyncHandler( async(req,res) => {
 
-    let filePath = '/home/comp-167/Desktop/Viraj/TodoList-with-NodeJS/Public/files/'+req.user.username+'_'+req.params.filename;
-    console.log(filePath);
+    let filePath = '/home/comp-167/Desktop/Viraj/TodoList-with-NodeJS/Public/files/'+req.user._id;
+    
+    const fileName = req.params.filename
     return res.download(filePath)
    
 })

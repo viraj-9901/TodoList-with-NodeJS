@@ -34,12 +34,9 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    files:[{
+    files: {
         type: Object
-    }],
-    originalFiles:[{
-        type: Object
-    }]
+    }
 },{ timestamps: true })
 
 taskSchema.pre('save', async function(req,res,next){

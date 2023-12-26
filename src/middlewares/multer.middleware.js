@@ -1,14 +1,16 @@
 import multer from 'multer'
+import fs from 'fs'
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './Public/files')
+    const path = `./Public/files/${req.user._id}`
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
+    }
+    cb(null, path)
   },
   filename: function (req, file, cb) {
-    // const userFile = req.files.files 
-    // req.user.userFiles = req.files.files
-    cb(null, file.originalname + '-' + req.user.username + '-' + (new Date()).valueOf())
-    // cb(null, file.originalname)
+    cb(null, file.originalname + '-' + (new Date()).valueOf())
   }
 })
 
