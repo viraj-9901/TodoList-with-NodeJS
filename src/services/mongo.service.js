@@ -1,6 +1,7 @@
 import { Task } from "../models/task.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError, handleError } from "../utils/ApiError.js";
+import { ObjectId } from 'mongodb'
 
 //function: get task of user
 const getTasks = async (userId,filter,value,sort = 1,role,type,limit,page) => {
@@ -114,6 +115,37 @@ const updateTask = async (userId,taskId,info,userRole) => {
     }
 }
 
+//function: get file name for download
+const fileName = async(taskId, userFile) => {
+    const file = await Task.aggregate([
+        {
+            $match : {_id: new ObjectId(taskId)}
+        },
+        {
+            $match: {
+                files:{
+                    $elemMatch: {
+                        userFileName : userFile
+                    }
+                }
+            }
+        }
+    ])
+
+    if(file[0].files){
+        let fileListLength = file[0].files.length
+
+        for(let i = 0; i < fileListLength; i++){
+            if(file[0].files[i].userFileName == userFile){
+                return file[0].files[i]
+            }
+        }
+
+    }
+    // return file.files[originalFileName]
+}
+
+//function: update user
 const updateUser = async(userId, info) => {
     try {
         const user = await User.findById(userId);
@@ -146,6 +178,7 @@ const mongoService = {
     createTask,
     deleteTask,
     updateTask,
+    fileName,
     updateUser
 }
 

@@ -151,10 +151,13 @@ const updateTask = asyncHandler(async (req,res) => {
 //download file
 const downloadFile = asyncHandler( async(req,res) => {
 
-    let filePath = '/home/comp-167/Desktop/Viraj/TodoList-with-NodeJS/Public/files/'+req.user._id;
-    
-    const fileName = req.params.filename
-    return res.download(filePath)
+    let rawFilePath = '/home/comp-167/Desktop/Viraj/TodoList-with-NodeJS/Public/files/'+req.user._id;
+    let userFile = req.params.filename;
+    let taskId = req.params.taskId;
+    // let userId = req.user._id
+    const filename = await mongoService.fileName(taskId, userFile)
+    let filePath = rawFilePath + '/' + filename.originalFileName
+    return res.download(filePath, filename.userFileName)
    
 })
 
