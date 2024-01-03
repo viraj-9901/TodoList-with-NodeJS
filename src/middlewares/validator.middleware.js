@@ -6,10 +6,20 @@ import { User } from "../models/user.model.js";
 
 const validator = {
     token : async(req,res,next) => {
-
         try 
         {   
+            // console.log(req);
             const routeUsername = req.params.username;
+           
+            
+            let token = req.cookies.accessToken
+            // console.log('1', req.headers.authorization);
+
+            if(token){
+                req.headers.authorization = 'Bearer ' + token
+                // console.log('2', req.headers.authorization);
+            }
+            
             
             let authenticateReturnFun = passport.authenticate('jwt', { session: false }, async (error, token) => {
                 if (error || !token) {
@@ -23,12 +33,13 @@ const validator = {
                 } 
                 
                 try {
-                
+                    
                     const user = await User.findOne(
                         {_id: token._id}
                     );
                     req.user = user;
-                 
+                    // console.log(req.user);
+                    // console.log(token);
                     const tokenUsername = req.user.username;
                     
                     if(! (routeUsername === tokenUsername)){
@@ -191,7 +202,7 @@ const validator = {
                         }
                     }));
             }
-            
+            console.log(req.body);
             let {title, description, dueDate, status, priority} = req.body;
            
             if(req.method === 'POST'){
@@ -244,7 +255,7 @@ const validator = {
                 
             //due date validation operation
             if(dueDate){
-                // console.log(dueDate);
+                console.log(dueDate);
             
                 let dateRegex =/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
                         
@@ -264,7 +275,7 @@ const validator = {
                 //dueDateObject is date object of dueDate 
                 let dueDateObject = new Date(dueDate)
 
-                if(dueDateObject < currentDate) {
+                if(dueDateObject <= currentDate) {
                     //res.status(400).send(new ApiError(400,'Current date is greater than due_date'))
                     return res.status(400).send(handleError(
                         {

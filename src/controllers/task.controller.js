@@ -10,42 +10,43 @@ import fs from 'fs'
 //get tasks of user
 const getTasks = asyncHandler(async (req,res) => {
     const userId = req.user._id
-
+    
     //filter tasks
-    const filter = req.query.filter;
-    let value = req.query.value;
+    // const filter = req.query.filter;
+    // let value = req.query.value;
 
-    if(filter == ""){
-        filter = 'priority'
-        value = "normal"   
-    }
+    // if(filter == ""){
+    //     filter = 'priority'
+    //     value = "normal"   
+    // }
 
-    if(value == ""){
-        filter == "priority"? value = 'normal' : value = 'pending'
-    }
+    // if(value == ""){
+    //     filter == "priority"? value = 'normal' : value = 'pending'
+    // }
 
     //sort tasks in order
-    let sort = req.query.sort;
-    if(sort == "" || sort == "asc"){
-        sort = 1
-    } else { sort = -1}
+    // let sort = req.query.sort;
+    // if(sort == "" || sort == "asc"){
+    //     sort = 1
+    // } else { sort = -1}
 
     //view users or tasks when admin call
-    let role = req.user.role
-    let type = req.query.type;
-    if(type == "") type = 'users'
+    // let role = req.user.role
+    // let type = req.query.type;
+    // if(type == "") type = 'users'
 
     //pagination
-    let limit = req.query.limit
-    if(limit == "") limit = 3
-    limit = parseInt(limit)
-    let page = req.query.page;
-    if(page == "") page = 0
-    page = parseInt(page)
-    page = page - 1;
+    // let limit = req.query.limit
+    // if(limit == "") limit = 3
+    // limit = parseInt(limit)
+    // let page = req.query.page;
+    // if(page == "") page = 0
+    // page = parseInt(page)
+    // page = page - 1;
 
     try {
-        const data = await mongoService.getTasks(userId,filter,value,sort,role,type,limit,page);
+        // const data = await mongoService.getTasks(userId,filter,value,sort,role,type,limit,page);
+        const data = await mongoService.getTasks(userId)
         return res.status(200).send(
             new ApiResponse(200,data)
         )
@@ -74,6 +75,7 @@ const getOneTask = asyncHandler( async (req,res) => {
 //add task to particular user
 const createTask = asyncHandler( async(req,res) => {
     const info = req.body;
+    console.log(info);
     const owner = req.user._id
     let files = [];
     

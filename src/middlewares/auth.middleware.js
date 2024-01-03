@@ -4,10 +4,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import Jwt from "jsonwebtoken";
 
 const verifyJWT = asyncHandler(async (req,res,next) => {
+    console.log(req.cookies);
     try {
-    
         const token = req.cookies?.accessToken || req.headers("Authorization")?.replace("Bearer ","");
-        
         if(!token){
             return res.status(401).send(handleError({
                 statusCode: 401,
@@ -20,7 +19,7 @@ const verifyJWT = asyncHandler(async (req,res,next) => {
 
         const decodedToken = Jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         const user = await User.findById(decodedToken._id).select('-password');
-
+        console.log(user);
         if(!user){
             return res.status(401).send(handleError({
                 statusCode: 401,
@@ -36,7 +35,7 @@ const verifyJWT = asyncHandler(async (req,res,next) => {
     } catch (error) {
         return res.status(401).send(handleError({
             statusCode: 401,
-            message: "Invalid access token",
+            message: "Invalid access token11",
             errors:{
                 error,
                 message: "Invalid access token"

@@ -17,7 +17,7 @@ router.route('/login')
 
 //route: logout user
 router.route('/logout')
-      .post(verifyJWT, logOutUser)
+      .post(verifyJWT, logOutUser) 
 
 //route: update user
 router.route('/:username')
@@ -30,6 +30,7 @@ router.route('/refresh-token')
 //route: get tasks of user
 router.route('/:username')
       .get(validator.token, taskController.getTasks)
+      // .get(verifyJWT, taskController.getTasks)
 
 //route: get perticular task of user
 router.route('/:username/:taskId')
