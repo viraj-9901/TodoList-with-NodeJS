@@ -5,11 +5,8 @@ import { ObjectId } from 'mongodb'
 
 //function: get task of user
 // const getTasks = async (userId,filter,value,sort = 1,role,type,limit,page) => {
-    const getTasks = async (userId) => {
+    const getTasks = async (userId,filter) => {
     try {
-        // let filterOption = {}
-        // filterOption[filter] = value
-
         // let skip = limit * page;
 
         // if(role == 'admin'){ 
@@ -17,14 +14,16 @@ import { ObjectId } from 'mongodb'
         //     return await User.find(filterOption).skip(skip).limit(limit)
         // }
 
-        // if(Object.keys(filterOption).length == 0){
-        //     return await Task.find({owner: userId}).skip(skip).limit(limit)
-        // } else {
-        //     return await Task.find({
-        //         $and: [{owner: userId}, filterOption]
-        //     }).sort({dueDate: sort}).skip(skip).limit(limit)
-        // }
-        return await Task.find({owner: userId})
+        if(Object.keys(filter).length < 2)
+        {
+            return await Task.find({owner: userId})
+        } 
+        
+        return await Task.find({
+                $and: [{owner: userId}, {priority: filter.priority}, {status: filter.status}]
+                    //    { $or: [{priority: priority}, {status: status}]}]
+                }).sort({dueDate: filter.sort})
+        
     } catch (error) {
         handleError(error,res)
     }

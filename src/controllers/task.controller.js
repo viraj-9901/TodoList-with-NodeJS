@@ -9,52 +9,78 @@ import fs from 'fs'
 
 //get tasks of user
 const getTasks = asyncHandler(async (req,res) => {
-    const userId = req.user._id
-    
-    //filter tasks
-    // const filter = req.query.filter;
-    // let value = req.query.value;
+    try{
+        const userId = req.user._id
+        
+        let filter = {id: userId}
 
-    // if(filter == ""){
-    //     filter = 'priority'
-    //     value = "normal"   
-    // }
+        let requestUrl = String(req.url)
+        
+        if(requestUrl.includes('?')){
+            
+            //filter tasks
+        
+            // // filter by priority
+            let priority = req.query.priority;
+        
+            if(priority == "" || priority == 'undefined'){
+                priority = "important"
+            }
+        
+            // filter by status
+            let status = req.query.status;
+        
+            if(status == "" || status == 'undefined'){
+                status = "pending"
+            }
+        
+            // sort by due date
+            let sort = req.query.sort;
+            
+            if(sort == "" || priority == 'undefined'){
+                sort = 1
+            } else {
+                sort = -1
+            }
 
-    // if(value == ""){
-    //     filter == "priority"? value = 'normal' : value = 'pending'
-    // }
+            // let filter = {priority,status,sort}
+            filter.priority = priority;
+            filter.status = status;
+            filter.sort = sort;
 
-    //sort tasks in order
-    // let sort = req.query.sort;
-    // if(sort == "" || sort == "asc"){
-    //     sort = 1
-    // } else { sort = -1}
 
-    //view users or tasks when admin call
-    // let role = req.user.role
-    // let type = req.query.type;
-    // if(type == "") type = 'users'
+            const data = await mongoService.getTasks(userId,filter)
+            return res.status(200).send(
+                new ApiResponse(200,data)
+            )
 
-    //pagination
-    // let limit = req.query.limit
-    // if(limit == "") limit = 3
-    // limit = parseInt(limit)
-    // let page = req.query.page;
-    // if(page == "") page = 0
-    // page = parseInt(page)
-    // page = page - 1;
+        }
 
-    try {
-        // const data = await mongoService.getTasks(userId,filter,value,sort,role,type,limit,page);
-        const data = await mongoService.getTasks(userId)
+        const data = await mongoService.getTasks(userId,filter)
         return res.status(200).send(
             new ApiResponse(200,data)
         )
     } catch (error) {
         handleError(error,res)
     }
+    
 })
 
+    //view users or tasks when admin call
+    // let role = req.user.role
+    // let type = req.query.type;             
+    // if(type == "") type = 'users'
+
+    //pagination
+    // let limit = req.query.limit
+    // if(limit == "") limit = 3
+    // limit = parseInt(limit)             
+    // let page = req.query.page;
+    // if(page == "") page = 0
+    // page = parseInt(page)
+    // page = page - 1;
+
+    
 //get one particular task of user
 const getOneTask = asyncHandler( async (req,res) => {
     const userId = req.user._id
