@@ -271,10 +271,83 @@ const updateUser = asyncHandler(async (req,res) => {
         )
 })
 
+const changePassword = asyncHandler(async(req,res) => {
+    try {
+        const {oldPassword, newPassword} = req.body;
+        console.log(req.body);
+        const userId = req.user._id;
+        // console.log(userId);
+        const user = await User.findById(userId);
+        console.log(user);
+        
+    
+        if(!user){
+            return res.status(401).send(handleError({
+                statusCode: 401,
+                message: "Invalid access token",
+                errors:{
+                    message: "Invalid access token"
+                }
+            }))
+        }
+    
+        const isOldPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+        console.log(isOldPasswordCorrect);
+
+        if(!isOldPasswordCorrect){
+            return res.status(401).send(handleError({
+                statusCode: 401,
+                message: "Wrong Old Password",
+                errors:{
+                    message: "Wrong Old Password"
+                }
+            }))
+        }
+       
+        // const updatedPassword = await User.updateOne(
+        //     {
+        //         _id: userId
+        //     },
+        //     {
+        //         $set: {
+        //             password: newPassword
+        //         }
+        //     },
+        //     {
+        //         new: true
+        //     }
+        // )
+        user.password = newPassword
+    
+        await user.save({validateBeforeSave: false})
+
+        return res.status(200)
+                  .json(
+                    new ApiResponse(
+                        200,
+                        "Password Update Successfully",
+                        {}
+                    )
+                  )
+
+    } catch (error) {
+        return res.status(500).send(handleError({
+            statusCode: 500,
+            message: "Something went wrong",
+            errors:{
+                message: "Wrong Old Password",
+                error
+            }
+        }))
+    }
+
+})
+
 export {
     registerUser,
     loginUser,
     logOutUser,
     refreshAccessToken,
-    updateUser
+    updateUser,
+    changePassword
 }

@@ -213,7 +213,7 @@ const validator = {
                     return res.status(400).send(handleError(
                         {
                             statusCode: 400, 
-                            message: "all field required", 
+                            message: "All fields are required to add task", 
                             errors: {
                                 RequiredField: "title, description, dueDate, priority, status"
                             }

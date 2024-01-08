@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser, changePassword } from "../controllers/user.controller.js";
 import taskController from "../controllers/task.controller.js";
 import { validator } from "../middlewares/validator.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -21,7 +21,11 @@ router.route('/logout')
 
 //route: update user
 router.route('/:username')
-      .put([verifyJWT, upload.fields([{name:'portfile', maxCount: 1}]), validator.user], updateUser)
+      .put([verifyJWT, upload.fields([{name:'porfile', maxCount: 1}]), validator.user], updateUser)
+
+//route: change password
+router.route('/:username/changePassword')
+      .put([validator.token, upload.fields([{name:'profile', maxCount: 1}])], changePassword)
 
 //route: refresh access token
 router.route('/refresh-token')
@@ -51,5 +55,6 @@ router.route('/:username/:taskId')
 //route: download file
 router.route('/:username/:taskId/:filename')
       .get(validator.token, taskController.downloadFile)
+
 export default router
 
