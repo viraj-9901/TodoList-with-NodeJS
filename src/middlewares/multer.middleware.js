@@ -7,11 +7,10 @@ const storage = multer.diskStorage({
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path, { recursive: true });
     }
-    console.log(req.body);
     cb(null, path)
   },
   filename: function (req, file, cb) {
-    console.log(req.body);
+    console.log(file);
     cb(null, file.originalname + '-' + (new Date()).valueOf())
   }
 })

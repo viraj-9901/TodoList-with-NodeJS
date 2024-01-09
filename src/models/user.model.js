@@ -19,7 +19,7 @@ const userSchema = new Schema({
         unique: true,
     },
     profile:{
-        type: String
+        type: Object
     },
     role:{
         type:String,
@@ -56,8 +56,8 @@ userSchema.methods.getAccessToken = function(){
     return Jwt.sign(
         {
             _id: this._id,
-            username: this.username,
-            email: this.email
+            // username: this.username,
+            // email: this.email
         },
         process.env.ACCESS_TOKEN_SECRET,
         {

@@ -274,13 +274,10 @@ const updateUser = asyncHandler(async (req,res) => {
 const changePassword = asyncHandler(async(req,res) => {
     try {
         const {oldPassword, newPassword} = req.body;
-        console.log(req.body);
         const userId = req.user._id;
-        // console.log(userId);
-        const user = await User.findById(userId);
-        console.log(user);
         
-    
+        const user = await User.findById(userId);
+  
         if(!user){
             return res.status(401).send(handleError({
                 statusCode: 401,
@@ -292,7 +289,6 @@ const changePassword = asyncHandler(async(req,res) => {
         }
     
         const isOldPasswordCorrect = await user.isPasswordCorrect(oldPassword)
-        console.log(isOldPasswordCorrect);
 
         if(!isOldPasswordCorrect){
             return res.status(401).send(handleError({
@@ -304,19 +300,6 @@ const changePassword = asyncHandler(async(req,res) => {
             }))
         }
        
-        // const updatedPassword = await User.updateOne(
-        //     {
-        //         _id: userId
-        //     },
-        //     {
-        //         $set: {
-        //             password: newPassword
-        //         }
-        //     },
-        //     {
-        //         new: true
-        //     }
-        // )
         user.password = newPassword
     
         await user.save({validateBeforeSave: false})
@@ -342,6 +325,33 @@ const changePassword = asyncHandler(async(req,res) => {
     }
 
 })
+const uploadProfile = asyncHandler(async(req,res) => {
+    const file = req.files
+    const userId = req.user._id;
+    let files = [];
+
+    const user = await User.findById(userId)
+
+    let userFile = file.profile[0].originalname
+    let originalFile = file.profile[0].filename
+
+    let temp = {
+        userFileName: userFile,
+        originalFileName: originalFile
+    }
+    files.push(temp)
+    console.log(files);
+    user.profile = files
+
+    user.save({validateBeforeSave: false})
+
+    return res.status(200)
+              .json(new ApiResponse(
+                200,
+                "Profile uploaded successfully",
+                {}
+              ))
+})
 
 export {
     registerUser,
@@ -349,5 +359,6 @@ export {
     logOutUser,
     refreshAccessToken,
     updateUser,
-    changePassword
+    changePassword,
+    uploadProfile
 }

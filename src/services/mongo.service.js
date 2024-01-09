@@ -41,7 +41,7 @@ const getOneTask = async (userId,taskId) => {
 }
 
 //function: create task for user
-const createTask = async (info, owner, files, originalFiles) => {
+const createTask = async (info, owner, files) => {
     try {
         const task = await Task.create({
             title: info.title, 
@@ -51,7 +51,7 @@ const createTask = async (info, owner, files, originalFiles) => {
             status: info.status,
             owner,
             files: files,
-            originalFiles: originalFiles
+            // originalFiles: originalFiles
         }) 
         return task
     } catch (error) {
@@ -151,23 +151,22 @@ const updateUser = async(userId, info) => {
     try {
         const user = await User.findById(userId);
 
-        return await User.updateOne(
+        await User.updateOne(
             {
                 _id: userId
             },
             {
                 $set:{
                     username: info.username || user.username,
-                    email: info.email || user.email,
-                    role: info.role || user.role,
-                    password: info.password || user.password
-
+                    email: info.email || user.email
                 }
             },
             {
                 new: true
             }
         )
+
+        return User.findById(userId).select("-password")
     } catch (error) {
         handleError(error,res)
     }

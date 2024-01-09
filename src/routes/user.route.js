@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser, changePassword } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser, changePassword, uploadProfile } from "../controllers/user.controller.js";
 import taskController from "../controllers/task.controller.js";
 import { validator } from "../middlewares/validator.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -26,6 +26,10 @@ router.route('/:username')
 //route: change password
 router.route('/:username/changePassword')
       .put([validator.token, upload.fields([{name:'profile', maxCount: 1}])], changePassword)
+
+//route: upload profile
+router.route('/:username/uploadProfile')
+      .post([validator.token, upload.fields([{name:'profile', maxCount: 1}]), validator.user], uploadProfile)
 
 //route: refresh access token
 router.route('/refresh-token')
