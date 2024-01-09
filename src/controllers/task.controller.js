@@ -104,7 +104,7 @@ const createTask = asyncHandler( async(req,res) => {
     console.log(info);
     const owner = req.user._id
     let files = [];
-    
+    console.log("input files: ",req.files);
     if(req.files.files){
         const fileList = req.files.files
 
@@ -179,12 +179,13 @@ const updateTask = asyncHandler(async (req,res) => {
 //download file
 const downloadFile = asyncHandler( async(req,res) => {
 
-    let rawFilePath = '/home/comp-167/Desktop/Viraj/TodoList-with-NodeJS/Public/files/'+req.user._id;
+    let rawFilePath = process.env.FILE_PATH+req.user._id;
     let userFile = req.params.filename;
     let taskId = req.params.taskId;
     // let userId = req.user._id
     const filename = await mongoService.fileName(taskId, userFile)
     let filePath = rawFilePath + '/' + filename.originalFileName
+    
     return res.download(filePath, filename.userFileName)
    
 })
