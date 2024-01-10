@@ -78,9 +78,11 @@ const deleteTask = async (userId,taskId,role) => {
 }
 
 //function: update task
-const updateTask = async (userId,taskId,info,userRole) => {
+const updateTask = async (userId,taskId,info,userRole,files) => {
     try {
         const previousData = await Task.findOne({_id: taskId})
+
+        
 
         async function updatePerform() {
             return await Task.updateOne(
@@ -93,9 +95,15 @@ const updateTask = async (userId,taskId,info,userRole) => {
                         description: info.description || previousData.description,
                         dueDate: info.dueDate || previousData.duDate,
                         priority: info.priority || previousData.priority,
-                        status: info.status || previousData.status
-                    }
-                }          
+                        status: info.status || previousData.status,
+                        files: previousData.files || files    
+                    },
+                    // $addToSet : {
+                    //     files: files
+                    // }
+                    
+                }
+                        
             )
         }
         

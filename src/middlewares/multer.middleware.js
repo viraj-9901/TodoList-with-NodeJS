@@ -1,9 +1,11 @@
 import multer from 'multer'
 import fs from 'fs'
+import { handleError } from '../utils/ApiError.js'
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const path = `./Public/files/${req.user._id}`
+
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path, { recursive: true });
     }

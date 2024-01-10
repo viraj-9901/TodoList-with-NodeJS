@@ -3,6 +3,7 @@ import { } from '../passport-config.js';
 import { ApiError, handleError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 // import Jwt from "jsonwebtoken";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const validator = {
     token : async(req,res,next) => {
@@ -319,6 +320,29 @@ const validator = {
             }
         
             //files validation
+            // upload(req, res, function (err) {
+            //     if (err instanceof multer.MulterError) {
+            //     // A Multer error occurred when uploading.
+            //     return res.status(400).send(handleError({
+            //             statusCode: 400, 
+            //             message: "You only upload 3 or less files", 
+            //             errors: {
+            //                 message: "More than 3 files uploaded"
+            //             }
+            //         }
+            //     ))
+            //     } else if (err) {
+            //     // An unknown error occurred when uploading.
+            //     return res.status(400).send(handleError({
+            //         statusCode: 400, 
+            //         message: "something went wrong while uploading file", 
+            //         errors: {
+            //             message: "error from nowhere"
+            //         }
+            //     }
+            //     ))
+            //     }
+            // })
             if(req.files.files) {
                 let filesLength = req.files.files.length
 

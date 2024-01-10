@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"; 
 import mongoService from '../services/mongo.service.js';
 import fs from 'fs'
+import { User } from "../models/user.model.js";
 
 
 
@@ -105,6 +106,7 @@ const createTask = asyncHandler( async(req,res) => {
     const owner = req.user._id
     let files = [];
     console.log("input files: ",req.files);
+    console.log("input files: ",req.files);
     if(req.files.files){
         const fileList = req.files.files
 
@@ -164,8 +166,29 @@ const updateTask = asyncHandler(async (req,res) => {
     const info = req.body
     const userRole = req.user.role
 
+    let files = [];
+    console.log("update files: ",req.files);
+    if(req.files.files){
+        const fileList = req.files.files
+        console.log('files-171: ',fileList);
+
+        for(let i =0; i < fileList.length; i++){
+            let file =  fileList[i]
+            let userFile = file.originalname
+            let originalFile = file.filename
+            
+            let temp = {
+                userFileName: userFile,
+                originalFileName: originalFile
+            }
+            files.push(temp)
+            
+        }
+    }
+
+    
     try {
-        const data = await mongoService.updateTask(userId,taskId,info,userRole)
+        const data = await mongoService.updateTask(userId,taskId,info,userRole,files)
         
         return res.status(200).send(
             new ApiResponse(200,data)
@@ -190,14 +213,29 @@ const downloadFile = asyncHandler( async(req,res) => {
    
 })
 
+//delete file
+// const deleteFile = asyncHandler( async(req,res) => {
+
+//     let rawFilePath = process.env.FILE_PATH+req.user._id;
+//     let userFile = req.params.filename;
+//     let taskId = req.params.taskId;
+//     // let userId = req.user._id
+//     const filename = await mongoService.fileName(taskId, userFile)
+//     let filePath = rawFilePath + '/' + filename.originalFileName
+//     console.log(filePath);
+//     fs.unlinkSync(filePath)
+//     // return res.delete(filePath, filename.userFileName)
+   
+// })
+
 const taskController = {
     getTasks,
     getOneTask,
     createTask,
     deleteTask,
     updateTask,
-    downloadFile
-    
+    downloadFile,
+    // deleteFile
 }
 
 export default taskController
