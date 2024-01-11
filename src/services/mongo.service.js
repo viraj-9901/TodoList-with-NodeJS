@@ -82,8 +82,6 @@ const updateTask = async (userId,taskId,info,userRole,files) => {
     try {
         const previousData = await Task.findOne({_id: taskId})
 
-        
-
         async function updatePerform() {
             return await Task.updateOne(
                 {
@@ -96,7 +94,7 @@ const updateTask = async (userId,taskId,info,userRole,files) => {
                         dueDate: info.dueDate || previousData.duDate,
                         priority: info.priority || previousData.priority,
                         status: info.status || previousData.status,
-                        files: previousData.files || files    
+                        files: files      
                     },
                     // $addToSet : {
                     //     files: files

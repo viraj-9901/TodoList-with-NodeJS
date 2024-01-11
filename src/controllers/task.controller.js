@@ -2,10 +2,9 @@ import { ApiError, handleError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"; 
 import mongoService from '../services/mongo.service.js';
-import fs from 'fs'
-import { User } from "../models/user.model.js";
-
-
+// import fs from 'fs'
+// import { User } from "../models/user.model.js";
+import { Task } from "../models/task.model.js";
 
 
 //get tasks of user
@@ -102,11 +101,9 @@ const getOneTask = asyncHandler( async (req,res) => {
 //add task to particular user
 const createTask = asyncHandler( async(req,res) => {
     const info = req.body;
-    console.log(info);
     const owner = req.user._id
     let files = [];
-    console.log("input files: ",req.files);
-    console.log("input files: ",req.files);
+
     if(req.files.files){
         const fileList = req.files.files
 
@@ -135,7 +132,6 @@ const createTask = asyncHandler( async(req,res) => {
         return res.status(200).send(
             new ApiResponse(200,data)
         )
-        //return new ApiResponse(200,data)
     } catch (error) {
         return res.json(handleError(error));
     }
@@ -167,11 +163,24 @@ const updateTask = asyncHandler(async (req,res) => {
     const userRole = req.user.role
 
     let files = [];
-    console.log("update files: ",req.files);
+
+    const task = await Task.findById(taskId)
+
+    if(!task){
+        return res.status(401).send(handleError({
+            statusCode: 401,
+            message: "Task not found",
+            errors:{
+                message: "wrong taskID"
+            }
+        }))
+    }
+
+    let previousFiles = task.files
+    console.log(previousFiles);
+
     if(req.files.files){
         const fileList = req.files.files
-        console.log('files-171: ',fileList);
-
         for(let i =0; i < fileList.length; i++){
             let file =  fileList[i]
             let userFile = file.originalname
@@ -186,9 +195,12 @@ const updateTask = asyncHandler(async (req,res) => {
         }
     }
 
-    
+    for(let i = 0; i < files.length; i++){
+        previousFiles.push(files[i])
+    }
+
     try {
-        const data = await mongoService.updateTask(userId,taskId,info,userRole,files)
+        const data = await mongoService.updateTask(userId,taskId,info,userRole,previousFiles)
         
         return res.status(200).send(
             new ApiResponse(200,data)
@@ -214,19 +226,50 @@ const downloadFile = asyncHandler( async(req,res) => {
 })
 
 //delete file
-// const deleteFile = asyncHandler( async(req,res) => {
+const deleteFile = asyncHandler( async (req,res) => {
+    let userId = req.user._id;
+    let taskId = req.params.taskId;
+    let userFile = req.params.filename;
+    let info = req.body;
+    let userRole = req.user.role;
 
-//     let rawFilePath = process.env.FILE_PATH+req.user._id;
-//     let userFile = req.params.filename;
-//     let taskId = req.params.taskId;
-//     // let userId = req.user._id
-//     const filename = await mongoService.fileName(taskId, userFile)
-//     let filePath = rawFilePath + '/' + filename.originalFileName
-//     console.log(filePath);
-//     fs.unlinkSync(filePath)
-//     // return res.delete(filePath, filename.userFileName)
-   
-// })
+    const task = await Task.findById(taskId)
+
+    if(!task){
+        return res.status(401).send(handleError({
+            statusCode: 401,
+            message: "Task not found",
+            errors:{
+                message: "wrong taskID"
+            }
+        }))
+    }
+
+    let previousFiles = task.files;
+    let updateFiles = []
+
+    for(let i = 0; i < previousFiles.length; i++){
+        if(previousFiles[i].userFileName !== userFile){
+            updateFiles.push(previousFiles[i])
+        }
+    }
+
+    try {
+        const data = await mongoService.updateTask(userId,taskId,info,userRole,updateFiles)
+        
+        return res.status(200).send(
+            new ApiResponse(200,data)
+        )
+
+    } catch (error) {
+        handleError(error,res)
+    }
+
+
+
+
+
+})
 
 const taskController = {
     getTasks,
@@ -235,7 +278,7 @@ const taskController = {
     deleteTask,
     updateTask,
     downloadFile,
-    // deleteFile
+    deleteFile
 }
 
 export default taskController

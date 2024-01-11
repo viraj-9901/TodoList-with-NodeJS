@@ -127,8 +127,7 @@ const loginUser = asyncHandler( async (req,res) => {
 
         const option = {
             httpOnly: false,
-            secure: false,
-            // Expires: new Date() 
+            secure: false
         }
 
         return res
@@ -340,7 +339,6 @@ const uploadProfile = asyncHandler(async(req,res) => {
         originalFileName: originalFile
     }
     files.push(temp)
-    console.log(files);
     user.profile = files
 
     user.save({validateBeforeSave: false})

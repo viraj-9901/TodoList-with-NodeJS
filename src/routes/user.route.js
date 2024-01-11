@@ -61,8 +61,8 @@ router.route('/:username/:taskId/:filename')
       .get(validator.token, taskController.downloadFile)
 
 //route: delete file
-// router.route('/:username/:taskId/delete/:filename')
-//       .get(validator.token, taskController.deleteFile)
+router.route('/:username/:taskId/delete/:filename')
+      .get(validator.token, taskController.deleteFile)
 
 export default router
 
