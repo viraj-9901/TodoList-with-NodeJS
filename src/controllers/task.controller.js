@@ -2,7 +2,7 @@ import { ApiError, handleError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js"; 
 import mongoService from '../services/mongo.service.js';
-// import fs from 'fs'
+import fs from 'fs'
 // import { User } from "../models/user.model.js";
 import { Task } from "../models/task.model.js";
 
@@ -177,7 +177,7 @@ const updateTask = asyncHandler(async (req,res) => {
     }
 
     let previousFiles = task.files
-    console.log(previousFiles);
+    // console.log(previousFiles);
 
     if(req.files.files){
         const fileList = req.files.files
@@ -235,6 +235,7 @@ const deleteFile = asyncHandler( async (req,res) => {
 
     const task = await Task.findById(taskId)
 
+    //delete file from database(mongoDB)
     if(!task){
         return res.status(401).send(handleError({
             statusCode: 401,
@@ -254,7 +255,23 @@ const deleteFile = asyncHandler( async (req,res) => {
         }
     }
 
+    //delete file from dist storage
+    let rawFilePath = process.env.FILE_PATH+req.user._id;
+    const filename = await mongoService.fileName(taskId, userFile)
+    let filePath = rawFilePath + '/' + filename.originalFileName
+
     try {
+
+        fs.unlink(filePath,(err) => {
+            if(err){
+                return res.status(500).send(handleError({
+                    statusCode: 500,
+                    message: "Something went wrong!",
+                    errors: err
+                }))
+            }
+        })
+
         const data = await mongoService.updateTask(userId,taskId,info,userRole,updateFiles)
         
         return res.status(200).send(

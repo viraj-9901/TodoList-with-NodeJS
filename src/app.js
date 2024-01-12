@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const app = express();
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: ["http://localhost:3000","http://localhost"],
     credentials: true,
     // Access-Control-Allow-Credentials: true
 }))

@@ -5,6 +5,19 @@ import { User } from "../models/user.model.js";
 // import Jwt from "jsonwebtoken";
 import { upload } from "../middlewares/multer.middleware.js";
 
+//date formater 
+Date.prototype.dateFormat = function(todayDate){
+    let month = todayDate.getMonth();
+    let date = todayDate.getDate()
+    if(todayDate.getMonth() + 1 < 10){
+        month = '0'+ (todayDate.getMonth() + 1)
+    }
+    if(todayDate.getDate() < 10){
+        date = '0'+ todayDate.getDate() 
+    }
+    return (todayDate.getFullYear() + '-' + month + '-' + date)
+}
+
 const validator = {
     token : async(req,res,next) => {
         try 
@@ -260,7 +273,8 @@ const validator = {
             
                 let dateRegex =/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
                         
-                let currentDate = new Date()
+                let currentDate = new Date().dateFormat(new Date())
+                // let currentDate = Date.dateFormat(new Date())
             
                 if(!(String(dueDate).match(dateRegex))){
                     return res.status(400).send(handleError(
@@ -276,7 +290,7 @@ const validator = {
                 //dueDateObject is date object of dueDate 
                 let dueDateObject = new Date(dueDate)
 
-                if(dueDateObject <= currentDate) {
+                if(dueDateObject < currentDate) {
                     //res.status(400).send(new ApiError(400,'Current date is greater than due_date'))
                     return res.status(400).send(handleError(
                         {
