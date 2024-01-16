@@ -4,6 +4,8 @@ import { ApiError, handleError } from "../utils/ApiError.js";
 import {ApiResponse} from '../utils/ApiResponse.js';
 import {asyncHandler} from '../utils/asyncHandler.js';
 import Jwt from "jsonwebtoken";
+import fs from 'fs';
+import nodemailer from 'nodemailer';
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -26,6 +28,14 @@ const generateAccessAndRefreshToken = async (userId) => {
         }))
     }
 }
+
+const transporter = nodemailer.createTransport({
+    service: process.env.SENDER_EMAIL_SERVICE,
+    auth:{
+        user: process.env.SENDER_EMAIL_ID,
+        pass: process.env.SENDER_EMAIL_PASS
+    }
+})
 
 const registerUser = asyncHandler(async (req,res) => {
 
@@ -60,6 +70,8 @@ const registerUser = asyncHandler(async (req,res) => {
             "-password"
         )
 
+        
+        
         if(!createdUser) {
             return res.status(500).send(handleError(
                 {
@@ -69,11 +81,39 @@ const registerUser = asyncHandler(async (req,res) => {
                         error: "error occuring while creating new user in controller"
                     }
                 }));
+            }
+            
+           
+        let token = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$^&*';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < 15) {
+            token += characters.charAt(Math.floor(Math.random() * charactersLength));
+            counter += 1;
         }
 
-        //generate jwt token for user
-        // const token = await user.getAccessToken()
+        createdUser.verificationToken = token;
+        createdUser.save({validateBeforeSave: false})
 
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL_ID,
+            to: createdUser.email,
+            subject: "Account verification",
+            text: "please click on below link to verify your account",
+            html: `<a>${process.env.BASE_URI}/${createdUser.username}/verify/${token}</a>`   
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log("error: ", error);
+            } else {
+                console.log('Email sent: ' + info.response);
+                console.log("Message sent: %s", info.messageId);
+            }
+        })
+       
+        
         return res.status(200).send(
             new ApiResponse(201,'user registration completed successfully',createdUser)
         )
@@ -82,6 +122,67 @@ const registerUser = asyncHandler(async (req,res) => {
         handleError(error,res)
     }
 
+})
+
+const verifyUser = asyncHandler( async (req,res) => {
+    try {
+        const username = req.params.username;
+        const token = req.params.token;
+
+        const user = await User.findOne({username: username});
+        
+        if(!user){
+            return res.status(500).send(handleError(
+                {
+                    statusCode: 500, 
+                    message: "User Not Found", 
+                    errors: {
+                        error: "error occuring while creating new user"
+                    }
+                }
+            ));   
+        }
+
+        if(user.verificationToken !== String(token)){
+            return res.status(400).send(handleError(
+                {
+                    statusCode: 400, 
+                    message: "Wrong Token", 
+                    errors: {
+                        error: "Wrong Token pass in URL"
+                    }
+                }
+            )); 
+        }
+
+        user.isVerified = true;
+        user.save({validateBeforeSave: false})
+       
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL_ID,
+            to: user.email,
+            subject: "Account verification complete",
+            text: "Your account verification complete, click on below link to continue... ",
+            html: `<a>${process.env.BASE_URI}/login</a>`   
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log("error: ", error);
+            } else {
+                console.log('Email sent: ' + info.response);
+                console.log("Message sent: %s", info.messageId);
+            }
+        })
+        
+        return res.status(200).send(
+            new ApiResponse(201, "Account verification done", {})
+        )
+        
+        
+    } catch (error) {
+        handleError(error,res)
+    }
 })
 
 
@@ -101,6 +202,17 @@ const loginUser = asyncHandler( async (req,res) => {
                     message: "user not found", 
                     errors: {
                         error: "error occuring while find user with username and password"
+                    }
+                }));
+        }
+
+        if(user.isVerified == false){
+            return res.status(400).send(handleError(
+                {
+                    statusCode: 400, 
+                    message: "Account verification pending", 
+                    errors: {
+                        error: "Account verification pending"
                     }
                 }));
         }
@@ -328,8 +440,24 @@ const uploadProfile = asyncHandler(async(req,res) => {
     const file = req.files
     const userId = req.user._id;
     let files = [];
+    let rawFilePath = process.env.FILE_PATH+userId;
+
 
     const user = await User.findById(userId)
+
+    let profileFile = user.profile[0].originalFileName;
+    if(profileFile){
+        let profileFilePath = rawFilePath + '/' + profileFile;
+
+        fs.unlinkSync(profileFilePath,(err) => {
+            if(err){
+                return res.status(500).send(handleError({
+                    statusCode: 500,
+                    message: "Something went wrong!",
+                    errors: err
+                }))
+            }})
+    }
 
     let userFile = file.profile[0].originalname
     let originalFile = file.profile[0].filename
@@ -358,5 +486,6 @@ export {
     refreshAccessToken,
     updateUser,
     changePassword,
-    uploadProfile
+    uploadProfile,
+    verifyUser
 }

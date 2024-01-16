@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser, changePassword, uploadProfile } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser, changePassword, uploadProfile, verifyUser } from "../controllers/user.controller.js";
 import taskController from "../controllers/task.controller.js";
 import { validator } from "../middlewares/validator.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -10,6 +10,10 @@ const router = Router()
 //route: register user 
 router.route('/register')
       .post([upload.fields([{name: 'profile', maxCount: 1}]),validator.user],registerUser);
+
+//route: verify user with email
+router.route('/:username/verify/:token')
+      .get(verifyUser)
 
 //route: login user 
 router.route('/login')
