@@ -165,7 +165,7 @@ const validator = {
         let validExtension = ['image/png','image/jpg','image/jpe','image/jpeg'];
         if(req.files.profile){
             let profileExtension = req.files?.profile[0]?.mimetype;
-            console.log(validExtension.includes(profileExtension));
+            // console.log(validExtension.includes(profileExtension));
             if(! validExtension.includes(profileExtension)){
                 return res.status(400).send(handleError({
                     statusCode: 400, 
@@ -216,7 +216,7 @@ const validator = {
                         }
                     }));
             }
-            console.log(req.body);
+            // console.log(req.body);
             let {title, description, dueDate, status, priority} = req.body;
            
             if(req.method === 'POST'){
@@ -269,7 +269,7 @@ const validator = {
                 
             //due date validation operation
             if(dueDate){
-                console.log(dueDate);
+                // console.log(dueDate);
             
                 let dateRegex =/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/;
                         
