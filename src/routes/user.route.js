@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser, changePassword, uploadProfile, verifyUser } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logOutUser, refreshAccessToken, updateUser, changePassword, uploadProfile, verifyUser, getAllUsers } from "../controllers/user.controller.js";
 import taskController from "../controllers/task.controller.js";
 import { validator } from "../middlewares/validator.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -38,6 +38,10 @@ router.route('/:username/uploadProfile')
 //route: refresh access token
 router.route('/refresh-token')
       .get(refreshAccessToken)
+
+//route: find user for assign task
+router.route('/:username/getAllUsers')
+      .get(verifyJWT, getAllUsers)
 
 //route: get tasks of user
 router.route('/:username')

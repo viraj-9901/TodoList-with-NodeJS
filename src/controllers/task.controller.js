@@ -5,6 +5,7 @@ import mongoService from '../services/mongo.service.js';
 import fs from 'fs'
 // import { User } from "../models/user.model.js";
 import { Task } from "../models/task.model.js";
+import { User } from "../models/user.model.js";
 
 
 //get tasks of user
@@ -255,7 +256,7 @@ const deleteFile = asyncHandler( async (req,res) => {
         }
     }
 
-    //delete file from dist storage
+    //delete file from disk storage
     let rawFilePath = process.env.FILE_PATH+req.user._id;
     const filename = await mongoService.fileName(taskId, userFile)
     let filePath = rawFilePath + '/' + filename.originalFileName
@@ -281,11 +282,7 @@ const deleteFile = asyncHandler( async (req,res) => {
     } catch (error) {
         handleError(error,res)
     }
-
-
-
-
-
+  
 })
 
 const taskController = {

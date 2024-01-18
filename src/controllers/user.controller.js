@@ -436,6 +436,7 @@ const changePassword = asyncHandler(async(req,res) => {
     }
 
 })
+
 const uploadProfile = asyncHandler(async(req,res) => {
     const file = req.files
     const userId = req.user._id;
@@ -479,6 +480,18 @@ const uploadProfile = asyncHandler(async(req,res) => {
               ))
 })
 
+const getAllUsers = asyncHandler(async (req,res) => {
+    let users = await User.find({})
+
+    return res.status(200).send(
+        new ApiResponse(
+            200,
+            "All Users from Database",
+            users
+        )
+    )
+})
+
 export {
     registerUser,
     loginUser,
@@ -487,5 +500,6 @@ export {
     updateUser,
     changePassword,
     uploadProfile,
-    verifyUser
+    verifyUser,
+    getAllUsers
 }
