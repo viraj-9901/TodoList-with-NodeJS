@@ -442,10 +442,14 @@ const uploadProfile = asyncHandler(async(req,res) => {
     const userId = req.user._id;
     let files = [];
     let rawFilePath = process.env.FILE_PATH+userId;
+    console.log(req.files);
 
 
     const user = await User.findById(userId)
+    console.log(user);
 
+    //delete profile image from disk storage
+    if(user.profile){
     let profileFile = user.profile[0].originalFileName;
     if(profileFile){
         let profileFilePath = rawFilePath + '/' + profileFile;
@@ -458,6 +462,7 @@ const uploadProfile = asyncHandler(async(req,res) => {
                     errors: err
                 }))
             }})
+    }
     }
 
     let userFile = file.profile[0].originalname
@@ -492,6 +497,36 @@ const getAllUsers = asyncHandler(async (req,res) => {
     )
 })
 
+const serveProfile = asyncHandler(async (req,res) => {
+    let userId = req.user._id;
+    let rawFilePath = process.env.FILE_PATH+req.user._id+'/'+'profile';
+
+    let user = await User.findById(userId);
+
+    if(!user){
+        return res.status(401).send(handleError({
+            statusCode: 401,
+            message: "Invalid access token",
+            errors:{
+                message: "Invalid access token"
+            }
+        }))
+    }
+
+    if(user.profile){
+        let filename = user.profile[0].originalFileName; 
+        let filePath = rawFilePath + '/' + filename;
+    
+        return res
+                  .status(200)
+                  .sendFile(filePath)
+    }
+
+    // return res.status(200).json({
+    //     message: "User doesn't have profile image"
+    // })
+})
+
 export {
     registerUser,
     loginUser,
@@ -501,5 +536,6 @@ export {
     changePassword,
     uploadProfile,
     verifyUser,
-    getAllUsers
+    getAllUsers,
+    serveProfile
 }
