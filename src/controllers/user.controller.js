@@ -486,7 +486,8 @@ const uploadProfile = asyncHandler(async(req,res) => {
 })
 
 const getAllUsers = asyncHandler(async (req,res) => {
-    let users = await User.find({})
+    let userFilter = req.params.inputValue
+    let users = await User.find({username: {$regex: userFilter, $options: 'i'}}).limit(3).select("_id username")
 
     return res.status(200).send(
         new ApiResponse(
@@ -496,6 +497,19 @@ const getAllUsers = asyncHandler(async (req,res) => {
         )
     )
 })
+
+// const getAllUsers = asyncHandler(async (req,res) => {
+   
+//     let users = await User.find({})
+
+//     return res.status(200).send(
+//         new ApiResponse(
+//             200,
+//             "All Users from Database",
+//             users
+//         )
+//     )
+// })
 
 const serveProfile = asyncHandler(async (req,res) => {
     let userId = req.user._id;

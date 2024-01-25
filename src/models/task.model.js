@@ -34,6 +34,11 @@ const taskSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
+    assignTo:{
+        // type: Schema.Types.ObjectId,
+        type: Object,
+        ref: 'User'
+    },
     files: {
         type: Object
     }

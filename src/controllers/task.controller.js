@@ -215,7 +215,7 @@ const updateTask = asyncHandler(async (req,res) => {
 //download file
 const downloadFile = asyncHandler( async(req,res) => {
 
-    let rawFilePath = process.env.FILE_PATH+req.user._id;
+    let rawFilePath = process.env.FILE_PATH + req.user._id + '/' + 'files';
     let userFile = req.params.filename;
     let taskId = req.params.taskId;
     // let userId = req.user._id
@@ -257,7 +257,7 @@ const deleteFile = asyncHandler( async (req,res) => {
     }
 
     //delete file from disk storage
-    let rawFilePath = process.env.FILE_PATH+req.user._id;
+    let rawFilePath = process.env.FILE_PATH + req.user._id + '/' + 'files';
     const filename = await mongoService.fileName(taskId, userFile)
     let filePath = rawFilePath + '/' + filename.originalFileName
 
@@ -285,6 +285,101 @@ const deleteFile = asyncHandler( async (req,res) => {
   
 })
 
+//function: assign task to other user(s)
+const assignTask = asyncHandler( async(req,res) => {
+    try {
+        let taskId = req.params.taskId;
+        let userId = req.user._id;
+        let assignToList = req.body.assignTo
+
+        let task = await Task.findById(taskId);
+
+        if(!task){
+            return res.status(401).send(handleError({
+                statusCode: 401,
+                message: "Task not found",
+                errors:{
+                    message: "wrong taskID"
+                }
+            }))
+        }
+
+        if(String(task.owner) !== String(userId)){
+            return res.status(401).send(handleError({
+                statusCode: 401,
+                message: "You are not allowed",
+                errors:{
+                    message: "Task owner and userId are different"
+                }
+            }))
+        }
+
+        task.assignTo = assignToList;
+        task.save({validateBeforeSave: false})
+        console.log("task after save: ",task);
+
+        return res.status(200)
+                  .json(new ApiResponse(
+                    200,
+                    "Task assign successfully",
+                    task
+                  ))
+
+    } catch (error) {
+        handleError(error,res)
+    }
+})
+
+//function: delete user from assign task
+const removeUserFromAssignTask = asyncHandler( async(req,res) => {
+    console.log('336');
+    try {
+        let taskId = req.params.taskId;
+        let userId = req.user._id;
+        let removeUserId = req.params.removeUserId;
+        let updatedAssignUsersList = []
+
+        let task = await Task.findById(taskId);
+
+        if(!task){
+            return res.status(401).send(handleError({
+                statusCode: 401,
+                message: "Task not found",
+                errors:{
+                    message: "wrong taskID"
+                }
+            }))
+        }
+
+        if(String(task.owner) !== String(userId)){
+            return res.status(401).send(handleError({
+                statusCode: 401,
+                message: "You are not allowed",
+                errors:{
+                    message: "Task owner and userId are different"
+                }
+            }))
+        }
+
+        let previousAssignUsersList = task.assignTo;
+
+        updatedAssignUsersList = previousAssignUsersList.filter((user) => user._id !== removeUserId)
+
+        task.assignTo = [...updatedAssignUsersList];
+        task.save({validateBeforeSave: false})
+        console.log(task);
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                "User remove from assign list",
+                task.assignTo
+            )
+        )
+    } catch (error) {
+        handleError(error,res)
+    }
+})
+
 const taskController = {
     getTasks,
     getOneTask,
@@ -292,7 +387,9 @@ const taskController = {
     deleteTask,
     updateTask,
     downloadFile,
-    deleteFile
+    deleteFile,
+    assignTask,
+    removeUserFromAssignTask
 }
 
 export default taskController

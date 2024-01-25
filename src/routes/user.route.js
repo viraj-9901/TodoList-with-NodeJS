@@ -44,8 +44,14 @@ router.route('/refresh-token')
       .get(refreshAccessToken)
 
 //route: find user for assign task
-router.route('/:username/getAllUsers')
+router.route('/:username/getAllUsers/:inputValue')
       .get(verifyJWT, getAllUsers)
+
+/***************************************** */
+//route: find user for assign task
+// router.route('/:username/getAllUsers')
+//       .get(verifyJWT, getAllUsers)
+/****************************************************** */
 
 //route: get tasks of user
 router.route('/:username')
@@ -75,6 +81,14 @@ router.route('/:username/:taskId/:filename')
 //route: delete file
 router.route('/:username/:taskId/delete/:filename')
       .get(validator.token, taskController.deleteFile)
+
+//route: assign task to other user(s)
+router.route('/:username/:taskId/assignTo')
+      .put(validator.token, taskController.assignTask)
+
+//route: delete your from assign user to task
+router.route('/:username/:taskId/removeAssign/:removeUserId')
+      .get(validator.token, taskController.removeUserFromAssignTask)
 
 export default router
 
