@@ -67,15 +67,15 @@ router.route('/:username')
       .post([validator.token, upload.fields([{name:'files', maxCount: 3}]),validator.task], taskController.createTask);
 
 //route: delete task from user
-router.route('/:username/:taskId')
+router.route('/:username/delete/:taskId')
       .delete(validator.token,taskController.deleteTask);
 
 //route: update particular task
-router.route('/:username/:taskId')
+router.route('/:username/update/:taskId')
       .put([validator.token, upload.fields([{name:'files', maxCount: 3}]),validator.task],taskController.updateTask);
 
 //route: download file
-router.route('/:username/:taskId/:filename')
+router.route('/:username/:taskId/download/:filename')
       .get(validator.token, taskController.downloadFile)
 
 //route: delete file

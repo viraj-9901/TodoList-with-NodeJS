@@ -186,7 +186,7 @@ const updateTask = asyncHandler(async (req,res) => {
             let file =  fileList[i]
             let userFile = file.originalname
             let originalFile = file.filename
-            
+
             let temp = {
                 userFileName: userFile,
                 originalFileName: originalFile
@@ -316,13 +316,15 @@ const assignTask = asyncHandler( async(req,res) => {
 
         task.assignTo = assignToList;
         task.save({validateBeforeSave: false})
-        console.log("task after save: ",task);
+        // let updatedAssignUserList = assignToList
+        // const data = await mongoService.updateTaskAssignTo(updatedAssignUserList, taskId)
 
         return res.status(200)
                   .json(new ApiResponse(
                     200,
                     "Task assign successfully",
-                    task
+                    task.assignTo
+                    // data
                   ))
 
     } catch (error) {
@@ -332,7 +334,6 @@ const assignTask = asyncHandler( async(req,res) => {
 
 //function: delete user from assign task
 const removeUserFromAssignTask = asyncHandler( async(req,res) => {
-    console.log('336');
     try {
         let taskId = req.params.taskId;
         let userId = req.user._id;
@@ -367,7 +368,6 @@ const removeUserFromAssignTask = asyncHandler( async(req,res) => {
 
         task.assignTo = [...updatedAssignUsersList];
         task.save({validateBeforeSave: false})
-        console.log(task);
         return res.status(200).json(
             new ApiResponse(
                 200,

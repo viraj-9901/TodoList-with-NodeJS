@@ -442,11 +442,11 @@ const uploadProfile = asyncHandler(async(req,res) => {
     const userId = req.user._id;
     let files = [];
     let rawFilePath = process.env.FILE_PATH+userId;
-    console.log(req.files);
+    // console.log(req.files);
 
 
     const user = await User.findById(userId)
-    console.log(user);
+    // console.log(user);
 
     //delete profile image from disk storage
     if(user.profile){

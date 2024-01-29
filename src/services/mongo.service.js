@@ -178,6 +178,31 @@ const updateUser = async(userId, info) => {
     }
 }
 
+//Function: assign task to user
+// const updateTaskAssignTo =  async(updatedAssignUserList,taskId) => {
+//     try {
+//         // const task = await Task.findById(taskId);
+
+//         await Task.updateOne(
+//             {
+//                 _id: taskId
+//             },
+//             {
+//                 $set:{
+//                     assignTo: updatedAssignUserList
+//                 }
+//             },
+//             {
+//                 new: true
+//             }
+//         )
+
+//         return Task.findById(taskId).select("assignTo")
+//     } catch (error) {
+//         handleError(error,res)
+//     }
+// }
+
 const mongoService = {
     getTasks,
     getOneTask,
